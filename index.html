@@ -524,19 +524,30 @@ function simUpd(){
   var base=project();
   var scen=project({ot:acq,ar:men});
   var diff=scen[11].sl-base[11].sl;
-  var ok=scen[11].sl>0&&scen.every(function(d){return d.sl>0;});
+  var minScen=scen.reduce(function(a,b){return a.sl<b.sl?a:b;});
+  var ok=minScen.sl>0&&scen.every(function(d){return d.sl>0;});
   var firstRed=scen.find(function(d){return d.sl<0;});
+
+  var minScen=scen.reduce(function(a,b){return a.sl<b.sl?a:b;});
+  var netAfter=S.entrate-tfx()-S.variabili-men;
+  var ok=minScen.sl>0&&scen.every(function(d){return d.sl>0;});
+  var tight=ok&&(netAfter<200||minScen.sl<500);
 
   var ans=document.getElementById('simAns');
   if(S.entrate===0){
     ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--surface2)';
     ans.innerHTML='<div class="sim-verdict" style="color:var(--muted)">—</div>'
       +'<div class="sim-detail" style="color:var(--muted)">Inserisci i dati in Setup per usare il simulatore.</div>';
-  } else if(ok){
+  } else if(ok&&!tight){
     ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--green-bg)';
     ans.innerHTML='<div class="sim-verdict" style="color:var(--green)">Sì, puoi permettertelo</div>'
       +'<div class="sim-detail" style="color:var(--green)">Il saldo rimane positivo per tutti i 12 mesi.</div>'
       +'<div class="sim-badge">Impatto a 12 mesi: '+(diff>=0?'+':'')+fmtK(diff)+'</div>';
+  } else if(tight){
+    ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--amber-bg)';
+    ans.innerHTML='<div class="sim-verdict" style="color:var(--amber)">Attenzione, margine stretto</div>'
+      +'<div class="sim-detail" style="color:var(--amber)">Tecnicamente sostenibile, ma il cuscinetto diventa molto basso. Saldo minimo previsto: '+fmtK(minScen.sl)+'.</div>'
+      +'<div class="sim-badge">Impatto a 12 mesi: '+fmtK(diff)+'</div>';
   } else {
     ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--red-bg)';
     ans.innerHTML='<div class="sim-verdict" style="color:var(--red)">No, attenzione</div>'

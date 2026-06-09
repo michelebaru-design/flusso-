@@ -1,473 +1,671 @@
-
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Flusso">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>Flusso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-.app{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;background:var(--color-background-primary);color:var(--color-text-primary);max-width:390px;margin:0 auto;min-height:600px}
-.screen{display:none}.screen.on{display:block}
-.topnav{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0}
-.wordmark{font-size:17px;font-weight:600;letter-spacing:-.4px}
-.nav-row{display:flex;gap:4px;background:var(--color-background-secondary);border-radius:10px;padding:3px}
-.nav-pill{font-size:12px;font-weight:500;padding:6px 12px;border-radius:7px;border:none;background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all .15s}
-.nav-pill.on{background:var(--color-background-primary);color:var(--color-text-primary);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.hero{padding:28px 20px 8px}
-.hero-label{font-size:13px;color:var(--color-text-secondary);margin-bottom:6px;font-weight:500}
-.hero-num{font-size:52px;font-weight:700;letter-spacing:-2px;line-height:1;margin-bottom:4px}
-.hero-sub{font-size:14px;color:var(--color-text-secondary)}
-.signal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 20px}
-.sig-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px 16px}
-.sig-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.sig-val{font-size:22px;font-weight:600;letter-spacing:-.5px;line-height:1;margin-bottom:3px}
-.sig-note{font-size:12px;color:var(--color-text-secondary)}
-.status-bar{margin:4px 20px 0;padding:14px 16px;border-radius:var(--border-radius-lg);display:flex;align-items:center;gap:10px}
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface2:#f5f5f7;--surface3:#e8e8ed;
+  --text:#1d1d1f;--muted:#6e6e73;--faint:#aeaeb2;
+  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.16);
+  --green:#248a3d;--green-bg:#e3f5e9;
+  --amber:#b25000;--amber-bg:#fef3e4;
+  --red:#c0001b;--red-bg:#fde8eb;
+  --gray:#6e6e73;--gray-bg:#f5f5f7;
+  --safe-top:env(safe-area-inset-top,44px);
+  --safe-bot:env(safe-area-inset-bottom,34px);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#000000;--surface:#1c1c1e;--surface2:#2c2c2e;--surface3:#3a3a3c;
+  --text:#f5f5f7;--muted:#aeaeb2;--faint:#636366;
+  --border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.18);
+  --green:#30d158;--green-bg:rgba(48,209,88,.14);
+  --amber:#ff9f0a;--amber-bg:rgba(255,159,10,.14);
+  --red:#ff375f;--red-bg:rgba(255,55,95,.14);
+  --gray:#aeaeb2;--gray-bg:rgba(255,255,255,.06);
+}}
+html{width:100%;height:100%;height:-webkit-fill-available}
+body{width:100%;height:100%;min-height:-webkit-fill-available;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;overflow:hidden;overscroll-behavior:none;position:fixed;inset:0}
+#app{width:100%;height:100%;height:100dvh;display:flex;flex-direction:column;overflow:hidden;max-width:430px;margin:0 auto}
+
+/* NAV TOP */
+#topnav{padding:calc(var(--safe-top) + 2px) 20px 0;background:var(--bg);position:relative;z-index:10;flex-shrink:0}
+.tn-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px}
+.wordmark{font-size:22px;font-weight:700;letter-spacing:-.6px;color:var(--text)}
+.seg{display:flex;background:var(--surface2);border-radius:10px;padding:2px;gap:2px}
+.seg-btn{font-size:13px;font-weight:500;padding:6px 11px;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.seg-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+
+/* SCROLL */
+#scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:0 0 calc(var(--safe-bot) + 20px)}
+#scroll::-webkit-scrollbar{display:none}
+
+/* SCREENS */
+.screen{display:none;padding:16px 20px 0}
+.screen.on{display:block}
+
+/* HERO NUMBER */
+.hero{padding:12px 0 20px}
+.hero-label{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:4px;letter-spacing:-.1px}
+.hero-num{font-size:56px;font-weight:700;letter-spacing:-2.5px;line-height:1;margin-bottom:6px;color:var(--text)}
+.hero-num.neg{color:var(--red)}
+.hero-sub{font-size:15px;color:var(--muted);letter-spacing:-.2px}
+
+/* STATUS PILL */
+.status{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:12px;margin-bottom:16px}
 .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.status-text{font-size:14px;font-weight:500}
-.chart-area{padding:16px 20px 4px}
-.chart-label{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px}
-.months-row{display:flex;justify-content:space-between;padding:4px 20px 0;margin-bottom:16px}
-.months-row span{font-size:11px;color:var(--color-text-secondary)}
-.section{padding:20px 20px 0}
-.section-title{font-size:13px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-.divider{height:.5px;background:var(--color-border-tertiary);margin:16px 20px}
-.field-stack{display:flex;flex-direction:column;gap:12px;padding:0 20px}
-.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.flabel{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px}
-input[type=number],select{width:100%;font-size:16px;padding:10px 12px;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none}
-input[type=number]:focus,select:focus{border-color:var(--color-border-primary)}
-.pri-btn{width:100%;padding:14px;border-radius:var(--border-radius-lg);border:none;background:var(--color-text-primary);color:var(--color-background-primary);font-size:16px;font-weight:600;cursor:pointer;margin-top:16px;letter-spacing:-.2px}
-.ghost-btn{background:transparent;border:.5px solid var(--color-border-secondary);color:var(--color-text-secondary);border-radius:var(--border-radius-md);padding:8px 14px;font-size:13px;font-weight:500;cursor:pointer}
-.fixed-list{display:flex;flex-direction:column;gap:8px;padding:0 20px;margin-bottom:8px}
-.fx-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)}
-.fx-name{font-size:14px;font-weight:500}
-.fx-meta{font-size:12px;color:var(--color-text-secondary);margin-top:1px}
-.fx-amt{font-size:15px;font-weight:600;color:var(--color-text-danger)}
-.add-btn{margin:0 20px 16px;padding:12px;border-radius:var(--border-radius-lg);border:.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);font-size:14px;font-weight:500;cursor:pointer;width:calc(100% - 40px);display:flex;align-items:center;justify-content:center;gap:6px}
-.sim-answer{margin:0 20px;padding:20px;border-radius:var(--border-radius-lg);text-align:center}
-.sim-verdict{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
-.sim-detail{font-size:14px;color:var(--color-text-secondary);line-height:1.5}
-.sim-impact{font-size:13px;font-weight:500;margin-top:10px;padding:8px 12px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);display:inline-block}
-.range-wrap{padding:0 20px;margin-bottom:20px}
-.range-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-.range-label{font-size:13px;color:var(--color-text-secondary);font-weight:500}
-.range-val{font-size:22px;font-weight:600;letter-spacing:-.5px}
-input[type=range]{width:100%;accent-color:var(--color-text-primary)}
-.goal-item{margin:0 20px 10px;padding:16px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg)}
+.status-text{font-size:14px;font-weight:500;line-height:1.3}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.kpi{background:var(--surface);border-radius:16px;padding:14px 16px;border:.5px solid var(--border)}
+.kpi-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.kpi-val{font-size:22px;font-weight:600;letter-spacing:-.6px;line-height:1;margin-bottom:2px}
+.kpi-note{font-size:12px;color:var(--muted)}
+
+/* CHART */
+.chart-card{background:var(--surface);border-radius:16px;padding:14px 16px;border:.5px solid var(--border);margin-bottom:10px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.chart-title{font-size:13px;font-weight:600;color:var(--text)}
+.chart-range{font-size:12px;color:var(--muted)}
+.chart-svg{width:100%;display:block;overflow:visible}
+.chart-months{display:flex;justify-content:space-between;margin-top:5px}
+.chart-months span{font-size:11px;color:var(--muted)}
+
+/* UPDATE ROW */
+.update-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px;border-top:.5px solid var(--border);margin-top:6px}
+.update-note{font-size:12px;color:var(--muted)}
+.link-btn{font-size:13px;font-weight:500;color:var(--text);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+/* SECTION HEADER */
+.sec-head{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px}
+
+/* SIM SLIDERS */
+.slider-card{background:var(--surface);border-radius:16px;padding:16px;border:.5px solid var(--border);margin-bottom:10px}
+.sl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.sl-label{font-size:13px;font-weight:500;color:var(--muted)}
+.sl-val{font-size:22px;font-weight:600;letter-spacing:-.5px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--surface3);border-radius:2px;outline:none;border:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--text);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+
+/* SIM ANSWER */
+.sim-answer{border-radius:16px;padding:20px;text-align:center;margin-bottom:10px}
+.sim-verdict{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:5px;line-height:1.1}
+.sim-detail{font-size:14px;line-height:1.5;margin-bottom:10px}
+.sim-badge{display:inline-block;font-size:13px;font-weight:500;padding:6px 12px;border-radius:8px;background:var(--surface)}
+
+/* COMPARE CHART */
+.compare-card{background:var(--surface);border-radius:16px;padding:14px 16px;border:.5px solid var(--border);margin-bottom:10px}
+.legend{display:flex;gap:14px;margin-top:8px}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.leg-line{width:16px;height:2px;border-radius:1px}
+
+/* GOALS */
+.goal-card{background:var(--surface);border-radius:16px;padding:16px;border:.5px solid var(--border);margin-bottom:10px}
 .goal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.goal-name{font-size:15px;font-weight:600}
-.goal-eta{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px}
-.goal-track{height:6px;background:var(--color-border-tertiary);border-radius:3px;overflow:hidden;margin-bottom:8px}
-.goal-fill{height:100%;border-radius:3px;background:var(--color-text-primary);transition:width 1s cubic-bezier(.22,1,.36,1)}
+.goal-name{font-size:16px;font-weight:600;letter-spacing:-.3px}
+.eta-pill{font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px}
+.goal-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;margin:8px 0}
+.goal-fill{height:100%;border-radius:3px;background:var(--text);transition:width 1s cubic-bezier(.22,1,.36,1)}
 .goal-meta{display:flex;justify-content:space-between}
-.goal-meta span{font-size:12px;color:var(--color-text-secondary)}
-.update-row{display:flex;gap:8px;align-items:center;padding:12px 20px;border-top:.5px solid var(--color-border-tertiary);margin-top:8px}
-.update-note{font-size:12px;color:var(--color-text-secondary);flex:1}
-.empty-hint{padding:24px 20px;text-align:center;color:var(--color-text-secondary);font-size:14px;line-height:1.5}
+.goal-meta span{font-size:12px;color:var(--muted)}
+.goal-footer{display:flex;justify-content:flex-end;margin-top:10px}
+
+/* FORM */
+.form-card{background:var(--surface);border-radius:16px;padding:16px;border:.5px solid var(--border);margin-bottom:10px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field-row.full{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:500;color:var(--muted)}
+.field input,.field select{background:var(--surface2);border:.5px solid var(--border2);border-radius:10px;color:var(--text);font-size:16px;font-weight:400;padding:10px 12px;outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s}
+.field input:focus,.field select:focus{border-color:var(--text)}
+.field input::placeholder{color:var(--faint)}
+.field select option{background:var(--surface)}
+
+/* BUTTONS */
+.pri-btn{width:100%;padding:14px;border-radius:12px;border:none;background:var(--text);color:var(--bg);font-size:16px;font-weight:600;cursor:pointer;letter-spacing:-.2px;margin-top:10px;transition:opacity .15s}
+.pri-btn:active{opacity:.75}
+.ghost-btn{background:transparent;border:.5px solid var(--border2);color:var(--muted);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:500;cursor:pointer}
+.ghost-btn:active{opacity:.65}
+.add-row{display:flex;justify-content:center;margin:4px 0 10px}
+.add-btn{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--muted);background:var(--surface);border:.5px solid var(--border);border-radius:10px;padding:10px 18px;cursor:pointer}
+
+/* FX LIST */
+.fx-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:.5px solid var(--border)}
+.fx-item:last-child{border-bottom:none}
+.fx-name{font-size:14px;font-weight:500}
+.fx-meta{font-size:12px;color:var(--muted);margin-top:1px}
+.fx-right{display:flex;align-items:center;gap:10px}
+.fx-amt{font-size:15px;font-weight:600;color:var(--red)}
+
+/* DIVIDER */
+.div{height:.5px;background:var(--border);margin:16px 0}
+
+/* EMPTY */
+.empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:14px;line-height:1.6}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--safe-bot) + 24px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);font-size:14px;font-weight:500;padding:10px 20px;border-radius:20px;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:999}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.screen.on > *{animation:fadeUp .3s cubic-bezier(.22,1,.36,1) both}
 </style>
+</head>
+<body>
+<div id="app">
 
-<div class="app">
-
-  <div class="topnav">
-    <div class="wordmark">Flusso</div>
-    <div class="nav-row">
-      <button class="nav-pill on" onclick="nav('home')">Home</button>
-      <button class="nav-pill" onclick="nav('simula')">Simula</button>
-      <button class="nav-pill" onclick="nav('goals')">Goals</button>
-      <button class="nav-pill" onclick="nav('setup')">Setup</button>
+  <div id="topnav">
+    <div class="tn-row">
+      <div class="wordmark">Flusso</div>
+      <div class="seg">
+        <button class="seg-btn on" onclick="nav('home')">Home</button>
+        <button class="seg-btn" onclick="nav('simula')">Simula</button>
+        <button class="seg-btn" onclick="nav('goals')">Goals</button>
+        <button class="seg-btn" onclick="nav('setup')">Setup</button>
+      </div>
     </div>
   </div>
 
-  <div class="screen on" id="s-home">
-    <div class="hero">
-      <div class="hero-label">Saldo tra 12 mesi</div>
-      <div class="hero-num" id="h-saldo12">—</div>
-      <div class="hero-sub" id="h-sub">Configura i dati in Setup</div>
-    </div>
+  <div id="scroll">
 
-    <div class="status-bar" id="statusBar">
-      <div class="status-dot" id="statusDot"></div>
-      <div class="status-text" id="statusText">Nessun dato inserito</div>
-    </div>
-
-    <div class="signal-row">
-      <div class="sig-card">
-        <div class="sig-label">Risparmio netto</div>
-        <div class="sig-val" id="h-netto">—</div>
-        <div class="sig-note">al mese</div>
+    <!-- HOME -->
+    <div class="screen on" id="s-home">
+      <div class="hero">
+        <div class="hero-label">Saldo tra 12 mesi</div>
+        <div class="hero-num" id="h12">—</div>
+        <div class="hero-sub" id="h12sub">Configura i dati in Setup</div>
       </div>
-      <div class="sig-card">
-        <div class="sig-label">Mese critico</div>
-        <div class="sig-val" id="h-critical">—</div>
-        <div class="sig-note" id="h-critical-sub">prossimi 12 mesi</div>
+
+      <div class="status" id="statusBar">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-text" id="statusText">Nessun dato inserito</div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Risparmio netto</div>
+          <div class="kpi-val" id="kpiNetto">—</div>
+          <div class="kpi-note">al mese</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Mese critico</div>
+          <div class="kpi-val" id="kpiCrit">—</div>
+          <div class="kpi-note" id="kpiCritSub">prossimi 12m</div>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Costi fissi</div>
+          <div class="kpi-val" id="kpiFissi">—</div>
+          <div class="kpi-note" id="kpiFissiSub">al mese</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Saldo minimo</div>
+          <div class="kpi-val" id="kpiMin">—</div>
+          <div class="kpi-note">nei 12 mesi</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <span class="chart-title">Proiezione saldo</span>
+          <span class="chart-range">12 mesi</span>
+        </div>
+        <svg class="chart-svg" id="homeChart" height="100" viewBox="0 0 340 100"></svg>
+        <div class="chart-months" id="homeMonths"></div>
+      </div>
+
+      <div class="update-row">
+        <span class="update-note" id="lastUpdate">Mai aggiornato</span>
+        <button class="link-btn" onclick="nav('setup')">Aggiorna saldo →</button>
       </div>
     </div>
 
-    <div class="chart-area">
-      <div class="chart-label">Proiezione saldo</div>
-      <svg id="homeChart" width="100%" height="90" viewBox="0 0 350 90" preserveAspectRatio="none"></svg>
-      <div class="months-row" id="chartMonths"></div>
+    <!-- SIMULA -->
+    <div class="screen" id="s-simula">
+      <div class="sec-head" style="margin-top:4px">Posso permettermi…</div>
+
+      <div class="slider-card">
+        <div class="sl-header">
+          <span class="sl-label">Acquisto una tantum</span>
+          <span class="sl-val" id="sv1">€1.000</span>
+        </div>
+        <input type="range" min="0" max="20000" step="100" value="1000" id="sl1" oninput="simUpd()">
+      </div>
+
+      <div class="slider-card">
+        <div class="sl-header">
+          <span class="sl-label">Nuova spesa mensile</span>
+          <span class="sl-val" id="sv2">€0</span>
+        </div>
+        <input type="range" min="0" max="1000" step="10" value="0" id="sl2" oninput="simUpd()">
+      </div>
+
+      <div class="sim-answer" id="simAns"></div>
+
+      <div class="compare-card">
+        <div class="chart-head">
+          <span class="chart-title">Base vs scenario</span>
+        </div>
+        <svg class="chart-svg" id="simChart" height="90" viewBox="0 0 340 90"></svg>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:var(--text)"></div>Base</div>
+          <div class="leg"><div class="leg-line" style="border-top:2px dashed var(--red);height:0;border-radius:0"></div>Scenario</div>
+        </div>
+      </div>
     </div>
 
-    <div class="update-row">
-      <div class="update-note" id="lastUpdate">Mai aggiornato</div>
-      <button class="ghost-btn" onclick="nav('setup')">Aggiorna saldo</button>
+    <!-- GOALS -->
+    <div class="screen" id="s-goals">
+      <div class="sec-head" style="margin-top:4px">Obiettivi</div>
+      <div id="goalsList"></div>
+
+      <div class="div"></div>
+      <div class="sec-head">Nuovo obiettivo</div>
+      <div class="form-card">
+        <div class="field-row">
+          <div class="field"><label>Nome</label><input type="text" id="gN" placeholder="Vacanze" maxlength="20"></div>
+          <div class="field"><label>Target €</label><input type="number" id="gT" placeholder="3000" inputmode="decimal"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Già risparmiato €</label><input type="number" id="gC" placeholder="0" inputmode="decimal"></div>
+          <div class="field"><label>Mensile dedicato €</label><input type="number" id="gM" placeholder="200" inputmode="decimal"></div>
+        </div>
+        <button class="pri-btn" onclick="addGoal()">Aggiungi obiettivo</button>
+      </div>
     </div>
+
+    <!-- SETUP -->
+    <div class="screen" id="s-setup">
+      <div class="sec-head" style="margin-top:4px">Situazione attuale</div>
+      <div class="form-card">
+        <div class="field-row">
+          <div class="field"><label>Saldo oggi €</label><input type="number" id="sSaldo" placeholder="4000" inputmode="decimal"></div>
+          <div class="field"><label>Entrate nette €/mese</label><input type="number" id="sEntrate" placeholder="3200" inputmode="decimal"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Uscite variabili €/mese</label><input type="number" id="sVari" placeholder="400" inputmode="decimal"></div>
+          <div class="field"><label>Risparmio target €/mese</label><input type="number" id="sRisp" placeholder="500" inputmode="decimal"></div>
+        </div>
+      </div>
+
+      <div class="sec-head">Costi fissi mensili</div>
+      <div class="form-card" id="fxCard">
+        <div id="fxList"></div>
+        <div class="div" id="fxDiv" style="display:none"></div>
+        <div class="field-row">
+          <div class="field"><label>Nome</label><input type="text" id="fxN" placeholder="Affitto" maxlength="20"></div>
+          <div class="field"><label>Importo €</label><input type="number" id="fxA" placeholder="850" inputmode="decimal"></div>
+        </div>
+        <div class="field-row full">
+          <div class="field"><label>Categoria</label>
+            <select id="fxC">
+              <option>Casa</option><option>Auto</option><option>Cibo</option>
+              <option>Salute</option><option>Svago</option><option>Abbonamenti</option><option>Altro</option>
+            </select>
+          </div>
+        </div>
+        <button class="pri-btn" onclick="addFx()" style="background:var(--surface2);color:var(--text);border:.5px solid var(--border2)">+ Aggiungi costo fisso</button>
+      </div>
+
+      <div class="sec-head">Entrate extra</div>
+      <div class="form-card">
+        <div id="exList"></div>
+        <div class="div" id="exDiv" style="display:none"></div>
+        <div class="field-row">
+          <div class="field"><label>Nome</label><input type="text" id="exN" placeholder="Freelance" maxlength="20"></div>
+          <div class="field"><label>Importo €</label><input type="number" id="exA" placeholder="300" inputmode="decimal"></div>
+        </div>
+        <div class="field-row full">
+          <div class="field"><label>Frequenza</label>
+            <select id="exF">
+              <option value="1">Ogni mese</option>
+              <option value="3">Ogni 3 mesi</option>
+              <option value="6">Ogni 6 mesi</option>
+              <option value="12">Annuale</option>
+            </select>
+          </div>
+        </div>
+        <button class="pri-btn" onclick="addEx()" style="background:var(--surface2);color:var(--text);border:.5px solid var(--border2)">+ Aggiungi entrata extra</button>
+      </div>
+
+      <button class="pri-btn" style="margin:0 0 12px" onclick="doSave()">Salva e aggiorna</button>
+      <button class="ghost-btn" style="width:100%;margin-bottom:32px;padding:12px" onclick="doReset()">Reset tutti i dati</button>
+    </div>
+
   </div>
-
-  <div class="screen" id="s-simula">
-    <div class="section" style="padding-top:24px">
-      <div class="section-title">Posso permettermi…</div>
-    </div>
-
-    <div class="range-wrap" style="margin-top:16px">
-      <div class="range-header">
-        <span class="range-label">Acquisto una tantum</span>
-        <span class="range-val" id="sim-val1">€1.000</span>
-      </div>
-      <input type="range" min="0" max="20000" step="100" value="1000" id="slAcquisto" oninput="simUpdate()">
-    </div>
-
-    <div class="range-wrap">
-      <div class="range-header">
-        <span class="range-label">Nuova spesa mensile</span>
-        <span class="range-val" id="sim-val2">€0</span>
-      </div>
-      <input type="range" min="0" max="1000" step="10" value="0" id="slMensile" oninput="simUpdate()">
-    </div>
-
-    <div class="sim-answer" id="simAnswer"></div>
-
-    <div class="divider" style="margin-top:20px"></div>
-
-    <div class="section">
-      <div class="section-title">Confronto 12 mesi</div>
-    </div>
-    <div class="chart-area" style="padding-top:8px">
-      <svg id="simChart" width="100%" height="100" viewBox="0 0 350 100" preserveAspectRatio="none"></svg>
-    </div>
-    <div style="display:flex;gap:16px;padding:4px 20px 16px">
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span style="width:16px;height:2px;background:var(--color-text-primary);display:inline-block;border-radius:1px"></span>Base</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span style="width:16px;height:0;border-top:2px dashed #E24B4A;display:inline-block"></span>Scenario</div>
-    </div>
-  </div>
-
-  <div class="screen" id="s-goals">
-    <div class="section" style="padding-top:24px;padding-bottom:12px">
-      <div class="section-title">I tuoi obiettivi</div>
-    </div>
-    <div id="goalsList"></div>
-
-    <div class="divider"></div>
-
-    <div class="field-stack" style="padding-bottom:16px">
-      <div class="field-row-2">
-        <div><div class="flabel">Nome</div><input type="text" id="gName" placeholder="Vacanze" maxlength="20"></div>
-        <div><div class="flabel">Target €</div><input type="number" id="gTarget" placeholder="3000" inputmode="decimal"></div>
-      </div>
-      <div class="field-row-2">
-        <div><div class="flabel">Già risparmiato €</div><input type="number" id="gCurrent" placeholder="0" inputmode="decimal"></div>
-        <div><div class="flabel">Mensile dedicato €</div><input type="number" id="gMonthly" placeholder="200" inputmode="decimal"></div>
-      </div>
-      <button class="pri-btn" style="margin-top:8px" onclick="addGoal()">Aggiungi obiettivo</button>
-    </div>
-  </div>
-
-  <div class="screen" id="s-setup">
-    <div class="section" style="padding-top:24px">
-      <div class="section-title">Situazione attuale</div>
-    </div>
-
-    <div class="field-stack" style="margin-top:8px">
-      <div class="field-row-2">
-        <div><div class="flabel">Saldo oggi €</div><input type="number" id="sSaldo" placeholder="4000" inputmode="decimal"></div>
-        <div><div class="flabel">Entrate nette €/mese</div><input type="number" id="sEntrate" placeholder="3200" inputmode="decimal"></div>
-      </div>
-      <div class="field-row-2">
-        <div><div class="flabel">Uscite variabili €/mese</div><input type="number" id="sVari" placeholder="400" inputmode="decimal"></div>
-        <div><div class="flabel">Risparmio target €/mese</div><input type="number" id="sRisp" placeholder="500" inputmode="decimal"></div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="section">
-      <div class="section-title">Costi fissi</div>
-    </div>
-
-    <div id="fxList" class="fixed-list"></div>
-
-    <div class="field-stack" style="padding-bottom:8px">
-      <div class="field-row-2">
-        <div><div class="flabel">Nome</div><input type="text" id="fxName" placeholder="Affitto" maxlength="20"></div>
-        <div><div class="flabel">Importo €</div><input type="number" id="fxAmt" placeholder="850" inputmode="decimal"></div>
-      </div>
-      <div><div class="flabel">Categoria</div>
-        <select id="fxCat">
-          <option value="Casa">Casa</option>
-          <option value="Auto">Auto</option>
-          <option value="Cibo">Cibo</option>
-          <option value="Salute">Salute</option>
-          <option value="Svago">Svago</option>
-          <option value="Abb.">Abbonamenti</option>
-          <option value="Altro">Altro</option>
-        </select>
-      </div>
-    </div>
-
-    <button class="add-btn" onclick="addFixed()">
-      <i class="ti ti-plus" style="font-size:16px" aria-hidden="true"></i> Aggiungi costo fisso
-    </button>
-
-    <div style="padding:0 20px 24px">
-      <button class="pri-btn" onclick="doSave()">Salva e aggiorna</button>
-      <button class="ghost-btn" style="width:100%;margin-top:10px;padding:12px" onclick="doReset()">Reset dati</button>
-    </div>
-  </div>
-
 </div>
+
+<div id="toast"></div>
 
 <script>
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-var LK='flusso_s1';
-var S={saldo:0,entrate:0,variabili:0,risparmio:0,fixed:[],goals:[]};
+var LK='flusso_v4';
+var S={saldo:0,entrate:0,variabili:0,risparmio:0,fixed:[],extras:[],goals:[]};
 
 function sv(){try{localStorage.setItem(LK,JSON.stringify(S));}catch(e){}}
 function ld(){try{var d=localStorage.getItem(LK);if(d)Object.assign(S,JSON.parse(d));}catch(e){}}
-function fE(v){return '\u20ac'+Math.round(Math.abs(v)).toLocaleString('it-IT');}
-function fS(v){return (v<0?'-':'')+fE(v);}
-function fK(v){var a=Math.abs(v);return (v<0?'-':'')+'\u20ac'+(a>=1000?(a/1000).toFixed(1)+'k':Math.round(a));}
+
+function fmtE(v){return '\u20ac'+Math.round(Math.abs(v)).toLocaleString('it-IT');}
+function fmtS(v){return (v<0?'-':'')+fmtE(v);}
+function fmtK(v){var a=Math.abs(v);return (v<0?'-':'')+'\u20ac'+(a>=1000?(a/1000).toFixed(1)+'k':Math.round(a));}
 
 function tfx(){return S.fixed.reduce(function(a,f){return a+(parseFloat(f.amt)||0);},0);}
 
-function project(opts){
-  opts=opts||{};
-  var sl=opts.sl!==undefined?opts.sl:S.saldo;
-  var en=opts.en!==undefined?opts.en:S.entrate;
-  var vr=opts.vr!==undefined?opts.vr:S.variabili;
-  var ar=opts.ar||0,ot=opts.ot||0;
+function project(o){
+  o=o||{};
+  var sl=o.sl!==undefined?o.sl:S.saldo;
+  var en=o.en!==undefined?o.en:S.entrate;
+  var vr=o.vr!==undefined?o.vr:S.variabili;
+  var ar=o.ar||0,ot=o.ot||0;
   var tf=tfx(),res=[],now=new Date();
   for(var m=0;m<12;m++){
     var mi=(now.getMonth()+m)%12;
-    var ot2=m===0?ot:0;
-    sl+=en-tf-vr-ar-ot2;
+    var xi=0;
+    for(var i=0;i<S.extras.length;i++){
+      var fr=parseInt(S.extras[i].freq)||1;
+      if(m%fr===0) xi+=parseFloat(S.extras[i].amt)||0;
+    }
+    sl+=(en+xi+ar)-(tf+vr)-(m===0?ot:0);
     res.push({mi:mi,sl:Math.round(sl)});
   }
   return res;
 }
 
-function nav(id){
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
-  document.querySelectorAll('.nav-pill').forEach(function(b,i){
-    b.classList.toggle('on',['home','simula','goals','setup'][i]===id);
-  });
-  var el=document.getElementById('s-'+id);
-  if(el)el.classList.add('on');
-  if(id==='home')renderHome();
-  if(id==='simula')simUpdate();
-  if(id==='goals')renderGoals();
-  if(id==='setup')renderSetup();
+/* SVG helpers */
+function svgEl(tag,attrs){
+  var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(var k in attrs)e.setAttribute(k,attrs[k]);
+  return e;
 }
 
-function drawChart(svgId,data,W,H,color){
-  W=W||350;H=H||90;
-  var svg=document.getElementById(svgId);
-  if(!svg)return;
-  svg.innerHTML='';
+function drawLine(svgId,data,W,H,col,dashed){
+  W=W||340;H=H||100;
+  var svg=document.getElementById(svgId);if(!svg)return;
   var vals=data.map(function(d){return d.sl;});
   var mn=Math.min.apply(null,vals.concat([0]));
   var mx=Math.max.apply(null,vals.concat([1]));
-  var rng=mx-mn||1;
-  var pad=8;
-  function sx(i){return pad+i*(W-pad*2)/(data.length-1);}
-  function sy(v){return H-4-((v-mn)/rng)*(H-16);}
-  var ns='http://www.w3.org/2000/svg';
-  function mk(t,a){var e=document.createElementNS(ns,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  var rng=mx-mn||1,px=6,py=8;
+  function sx(i){return px+i*(W-px*2)/(data.length-1);}
+  function sy(v){return H-py-((v-mn)/rng)*(H-py*2);}
+
   if(mn<0&&mx>0){
-    svg.appendChild(mk('line',{x1:0,y1:sy(0),x2:W,y2:sy(0),stroke:'#E24B4A','stroke-width':'0.5','stroke-dasharray':'3 2',opacity:'.5'}));
+    svg.appendChild(svgEl('line',{x1:0,y1:sy(0).toFixed(1),x2:W,y2:sy(0).toFixed(1),
+      stroke:'var(--red)','stroke-width':'0.5','stroke-dasharray':'3 2',opacity:'.4'}));
   }
-  var defs=mk('defs',{});
-  var g=mk('linearGradient',{id:'cg'+svgId,x1:'0',y1:'0',x2:'0',y2:'1'});
-  var c=color||'currentColor';
-  var s1=mk('stop',{'offset':'0%','stop-color':c,'stop-opacity':'.15'});
-  var s2=mk('stop',{'offset':'100%','stop-color':c,'stop-opacity':'0'});
+
+  var defs=svgEl('defs',{});
+  var gid='grad_'+svgId+(dashed?'_s':'');
+  var g=svgEl('linearGradient',{id:gid,x1:'0',y1:'0',x2:'0',y2:'1'});
+  var col0=col||'var(--text)';
+  var s1=svgEl('stop',{'offset':'0%','stop-color':col0,'stop-opacity':dashed?'0':'.14'});
+  var s2=svgEl('stop',{'offset':'100%','stop-color':col0,'stop-opacity':'0'});
   g.appendChild(s1);g.appendChild(s2);defs.appendChild(g);svg.appendChild(defs);
-  var pts=data.map(function(d,i){return sx(i).toFixed(1)+','+sy(d.sl).toFixed(1);}).join(' ');
-  var last=data[data.length-1];
-  svg.appendChild(mk('path',{d:'M'+pts.split(' ').join(' L')+' L'+sx(data.length-1)+','+H+' L'+sx(0)+','+H+' Z',fill:'url(#cg'+svgId+')'}));
-  var lp=mk('path',{d:'M'+pts.split(' ').join(' L'),fill:'none',stroke:c,'stroke-width':'1.5','stroke-linecap':'round','stroke-linejoin':'round'});
-  var len=400;lp.style.strokeDasharray=len;lp.style.strokeDashoffset=len;
+
+  var pts=data.map(function(d,i){return sx(i).toFixed(1)+','+sy(d.sl).toFixed(1);}).join(' L');
+  if(!dashed){
+    var last=data[data.length-1];
+    svg.appendChild(svgEl('path',{
+      d:'M'+pts+' L'+sx(data.length-1).toFixed(1)+','+H+' L'+sx(0).toFixed(1)+','+H+' Z',
+      fill:'url(#'+gid+')'}));
+  }
+
+  var lp=svgEl('path',{d:'M'+pts,fill:'none',stroke:col0,'stroke-width':dashed?'1.5':'2',
+    'stroke-linecap':'round','stroke-linejoin':'round'});
+  if(dashed)lp.setAttribute('stroke-dasharray','6 3');
+  var len=W*1.4;
+  lp.style.strokeDasharray=len;lp.style.strokeDashoffset=len;
   lp.style.transition='stroke-dashoffset .9s cubic-bezier(.22,1,.36,1) .1s';
   svg.appendChild(lp);
   requestAnimationFrame(function(){requestAnimationFrame(function(){lp.style.strokeDashoffset='0';});});
 }
 
-function drawCompare(svgId,base,scen){
-  var W=350,H=100,ns='http://www.w3.org/2000/svg';
-  var svg=document.getElementById(svgId);if(!svg)return;svg.innerHTML='';
-  var all=base.map(function(d){return d.sl;}).concat(scen.map(function(d){return d.sl;}));
-  var mn=Math.min.apply(null,all.concat([0]));
-  var mx=Math.max.apply(null,all.concat([1]));
-  var rng=mx-mn||1,pad=8;
-  function sx(i){return pad+i*(W-pad*2)/11;}
-  function sy(v){return H-4-((v-mn)/rng)*(H-16);}
-  function mk(t,a){var e=document.createElementNS(ns,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
-  function addLine(data,col,dsh){
-    var pts=data.map(function(d,i){return sx(i).toFixed(1)+','+sy(d.sl).toFixed(1);}).join(' L');
-    var lp=mk('path',{d:'M'+pts,fill:'none',stroke:col,'stroke-width':'1.5','stroke-linecap':'round','stroke-linejoin':'round'});
-    if(dsh)lp.setAttribute('stroke-dasharray','5 3');
-    svg.appendChild(lp);
-  }
-  addLine(base,'var(--color-text-primary)',false);
-  addLine(scen,'#E24B4A',true);
+/* NAV */
+var TABS=['home','simula','goals','setup'];
+function nav(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.seg-btn').forEach(function(b,i){b.classList.toggle('on',TABS[i]===id);});
+  var pg=document.getElementById('s-'+id);
+  if(pg){pg.classList.add('on');}
+  document.getElementById('scroll').scrollTop=0;
+  if(id==='home')renderHome();
+  if(id==='simula'){renderSim();simUpd();}
+  if(id==='goals')renderGoals();
+  if(id==='setup')renderSetup();
 }
 
+/* HOME */
 function renderHome(){
   var p=project();
   var last=p[11].sl;
   var tf=tfx();
   var net=S.entrate-tf-S.variabili;
-  var minM=p.reduce(function(a,b){return a.sl<b.sl?a:b;});
+  var minPt=p.reduce(function(a,b){return a.sl<b.sl?a:b;});
+  var maxAbs=Math.max.apply(null,p.map(function(d){return Math.abs(d.sl);}));
 
-  document.getElementById('h-saldo12').textContent=fK(last);
-  document.getElementById('h-netto').textContent=fS(net);
+  var el12=document.getElementById('h12');
+  el12.textContent=S.entrate>0?fmtK(last):'—';
+  el12.className='hero-num'+(last<0?' neg':'');
 
-  var now=new Date();
-  var critIdx=(now.getMonth()+p.indexOf(minM))%12;
-  document.getElementById('h-critical').textContent=MI[minM.mi];
-  document.getElementById('h-critical-sub').textContent=fK(minM.sl)+' previsto';
+  document.getElementById('h12sub').textContent=
+    S.entrate>0?('Proiezione lineare · risparmio netto '+fmtE(Math.max(0,net))+'/mese'):
+    'Configura i dati in Setup';
 
-  var sub=S.entrate>0?'Proiezione su '+Math.round(net)+'\u20ac/mese netti':'Configura i dati in Setup';
-  document.getElementById('h-sub').textContent=sub;
+  document.getElementById('kpiNetto').textContent=S.entrate>0?fmtS(net):'—';
+  document.getElementById('kpiNetto').style.color=net>=0?'var(--green)':'var(--red)';
+  document.getElementById('kpiCrit').textContent=S.entrate>0?MI[minPt.mi]:'—';
+  document.getElementById('kpiCritSub').textContent=S.entrate>0?fmtK(minPt.sl):'prossimi 12m';
+  document.getElementById('kpiFissi').textContent=S.entrate>0?fmtE(tf):'—';
+  document.getElementById('kpiFissiSub').textContent=S.entrate>0?
+    (Math.round(tf/S.entrate*100)+'% delle entrate'):'al mese';
+  document.getElementById('kpiMin').textContent=S.entrate>0?fmtK(minPt.sl):'—';
+  document.getElementById('kpiMin').style.color=minPt.sl<0?'var(--red)':minPt.sl<500?'var(--amber)':'var(--text)';
 
   var dot=document.getElementById('statusDot');
   var bar=document.getElementById('statusBar');
   var txt=document.getElementById('statusText');
   if(S.entrate===0){
-    dot.style.background='#B4B2A9';bar.style.background='var(--color-background-secondary)';
-    txt.textContent='Nessun dato inserito — vai in Setup';txt.style.color='var(--color-text-secondary)';
+    dot.style.background='var(--faint)';
+    bar.style.cssText='background:var(--surface2);border-radius:12px;margin-bottom:16px;display:inline-flex;align-items:center;gap:7px;padding:9px 14px';
+    txt.textContent='Nessun dato — vai in Setup per iniziare';
+    txt.style.color='var(--muted)';
   } else if(last<0||net<0){
-    dot.style.background='#E24B4A';bar.style.background='#FCEBEB';
-    txt.textContent='Attenzione: saldo in rosso previsto';txt.style.color='#A32D2D';
+    dot.style.background='var(--red)';
+    bar.style.cssText='background:var(--red-bg);border-radius:12px;margin-bottom:16px;display:inline-flex;align-items:center;gap:7px;padding:9px 14px';
+    txt.textContent='Attenzione: saldo in rosso previsto';
+    txt.style.color='var(--red)';
   } else if(last<1000||net<200){
-    dot.style.background='#EF9F27';bar.style.background='#FAEEDA';
-    txt.textContent='Margine stretto — controlla le spese';txt.style.color='#854F0B';
+    dot.style.background='var(--amber)';
+    bar.style.cssText='background:var(--amber-bg);border-radius:12px;margin-bottom:16px;display:inline-flex;align-items:center;gap:7px;padding:9px 14px';
+    txt.textContent='Margine stretto — controlla le spese';
+    txt.style.color='var(--amber)';
   } else {
-    dot.style.background='#639922';bar.style.background='#EAF3DE';
-    txt.textContent='Tutto in ordine — proiezione positiva';txt.style.color='#3B6D11';
+    dot.style.background='var(--green)';
+    bar.style.cssText='background:var(--green-bg);border-radius:12px;margin-bottom:16px;display:inline-flex;align-items:center;gap:7px;padding:9px 14px';
+    txt.textContent='Tutto in ordine — proiezione positiva';
+    txt.style.color='var(--green)';
   }
 
-  var isDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
-  drawChart('homeChart',p,350,90,isDark?'#ffffff':'#111827');
+  var svg=document.getElementById('homeChart');
+  if(svg&&S.entrate>0){svg.innerHTML='';drawLine('homeChart',p,340,100,null,false);}
 
-  var ml=document.getElementById('chartMonths');ml.innerHTML='';
+  var ml=document.getElementById('homeMonths');
+  ml.innerHTML='';
   [0,3,6,9,11].forEach(function(i){
     var s=document.createElement('span');s.textContent=MI[p[i].mi];ml.appendChild(s);
   });
+
+  try{
+    var upd=localStorage.getItem(LK+'_upd');
+    if(upd)document.getElementById('lastUpdate').textContent='Aggiornato il '+upd;
+  }catch(e){}
 }
 
-function simUpdate(){
-  var acq=parseFloat(document.getElementById('slAcquisto').value)||0;
-  var men=parseFloat(document.getElementById('slMensile').value)||0;
-  document.getElementById('sim-val1').textContent=fE(acq);
-  document.getElementById('sim-val2').textContent=fE(men);
+/* SIMULATOR */
+function renderSim(){}
+
+function simUpd(){
+  var acq=parseFloat(document.getElementById('sl1').value)||0;
+  var men=parseFloat(document.getElementById('sl2').value)||0;
+  document.getElementById('sv1').textContent=fmtE(acq);
+  document.getElementById('sv2').textContent=fmtE(men);
 
   var base=project();
-  var scen=project({ot:acq,ar:men});
+  var scen=project({ot:acq,ar:-men});
   var diff=scen[11].sl-base[11].sl;
-  var canAfford=scen[11].sl>500&&scen.every(function(d){return d.sl>-500;});
+  var ok=scen[11].sl>200&&scen.every(function(d){return d.sl>-200;});
+  var firstRed=scen.find(function(d){return d.sl<0;});
 
-  var ans=document.getElementById('simAnswer');
-  var tf=tfx();var net=S.entrate-tf-S.variabili;
+  var ans=document.getElementById('simAns');
   if(S.entrate===0){
-    ans.style.background='var(--color-background-secondary)';
-    ans.innerHTML='<div class="sim-verdict" style="color:var(--color-text-secondary)">—</div><div class="sim-detail">Inserisci i dati in Setup per usare il simulatore.</div>';
-  } else if(canAfford){
-    ans.style.background='#EAF3DE';
-    ans.innerHTML='<div class="sim-verdict" style="color:#3B6D11">Si, puoi permettertelo</div>'
-      +'<div class="sim-detail" style="color:#3B6D11">Il saldo rimane positivo per tutti i 12 mesi.</div>'
-      +'<div class="sim-impact" style="color:#27500A">Impatto: '+fS(diff)+' sul saldo a 12 mesi</div>';
+    ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--surface2)';
+    ans.innerHTML='<div class="sim-verdict" style="color:var(--muted)">—</div>'
+      +'<div class="sim-detail" style="color:var(--muted)">Inserisci i dati in Setup per usare il simulatore.</div>';
+  } else if(ok){
+    ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--green-bg)';
+    ans.innerHTML='<div class="sim-verdict" style="color:var(--green)">Sì, puoi permettertelo</div>'
+      +'<div class="sim-detail" style="color:var(--green)">Il saldo rimane positivo per tutti i 12 mesi.</div>'
+      +'<div class="sim-badge">Impatto a 12 mesi: '+(diff>=0?'+':'')+fmtK(diff)+'</div>';
   } else {
-    var firstRed=scen.find(function(d){return d.sl<0;});
-    ans.style.background='#FCEBEB';
-    ans.innerHTML='<div class="sim-verdict" style="color:#A32D2D">No, attenzione</div>'
-      +'<div class="sim-detail" style="color:#791F1F">'+(firstRed?'Il saldo va in rosso in '+MI[firstRed.mi]+'.':'Margine troppo stretto.')+'</div>'
-      +'<div class="sim-impact" style="color:#501313">Impatto: '+fS(diff)+' a 12 mesi</div>';
+    ans.style.cssText='border-radius:16px;padding:20px;text-align:center;margin-bottom:10px;background:var(--red-bg)';
+    ans.innerHTML='<div class="sim-verdict" style="color:var(--red)">No, attenzione</div>'
+      +'<div class="sim-detail" style="color:var(--red)">'
+        +(firstRed?'Il saldo va in rosso in '+MI[firstRed.mi]+'.':'Il margine diventa troppo stretto.')
+      +'</div>'
+      +'<div class="sim-badge">Impatto a 12 mesi: '+fmtK(diff)+'</div>';
   }
 
-  var isDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
-  drawCompare('simChart',base,scen);
+  var svg=document.getElementById('simChart');
+  if(svg){
+    svg.innerHTML='';
+    drawLine('simChart',base,340,90,null,false);
+    drawLine('simChart',scen,340,90,'var(--red)',true);
+  }
 }
 
+/* GOALS */
+function addGoal(){
+  var n=(document.getElementById('gN').value||'').trim();
+  var t=parseFloat(document.getElementById('gT').value)||0;
+  var c=parseFloat(document.getElementById('gC').value)||0;
+  var m=parseFloat(document.getElementById('gM').value)||0;
+  if(!n||!t){toast('Inserisci nome e target');return;}
+  S.goals.push({id:Date.now(),name:n,target:t,current:c,monthly:m});
+  sv();
+  ['gN','gT','gC','gM'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  renderGoals();
+  toast('Obiettivo aggiunto');
+}
+
+function rmGoal(id){S.goals=S.goals.filter(function(g){return g.id!==id;});sv();renderGoals();}
+
 function renderGoals(){
-  var c=document.getElementById('goalsList');
+  var c=document.getElementById('goalsList');if(!c)return;
   if(!S.goals.length){
-    c.innerHTML='<div class="empty-hint">Nessun obiettivo ancora.<br>Aggiungine uno qui sotto.</div>';
+    c.innerHTML='<div class="empty">Nessun obiettivo ancora.<br>Aggiungine uno qui sotto.</div>';
     return;
   }
   c.innerHTML='';
   S.goals.forEach(function(g){
     var rem=Math.max(0,g.target-g.current);
     var mths=g.monthly>0?Math.ceil(rem/g.monthly):null;
-    var pct=Math.min(100,Math.round((g.current/g.target)*100))||0;
-    var etaCls,etaTxt;
-    if(!mths){etaCls='background:#F1EFE8;color:#5F5E5A';etaTxt='Imposta mensile';}
-    else if(mths<=12){etaCls='background:#EAF3DE;color:#3B6D11';etaTxt='tra '+mths+' mes'+(mths===1?'e':'i');}
-    else if(mths<=36){etaCls='background:#FAEEDA;color:#854F0B';etaTxt='tra '+mths+' mesi';}
-    else{etaCls='background:#FCEBEB;color:#A32D2D';etaTxt='~'+Math.round(mths/12)+' anni';}
-    var d=document.createElement('div');d.className='goal-item';
-    d.innerHTML='<div class="goal-top"><div class="goal-name">'+g.name+'</div>'
-      +'<div class="goal-eta" style="'+etaCls+'">'+etaTxt+'</div></div>'
+    var pct=Math.min(100,Math.round(g.current/g.target*100))||0;
+    var ecls,etxt;
+    if(!mths){ecls='background:var(--gray-bg);color:var(--gray)';etxt='Imposta mensile';}
+    else if(mths<=12){ecls='background:var(--green-bg);color:var(--green)';etxt='tra '+mths+' mes'+(mths===1?'e':'i');}
+    else if(mths<=36){ecls='background:var(--amber-bg);color:var(--amber)';etxt='tra '+mths+' mesi';}
+    else{ecls='background:var(--red-bg);color:var(--red)';etxt='~'+Math.round(mths/12)+' anni';}
+    var d=document.createElement('div');d.className='goal-card';
+    d.innerHTML='<div class="goal-top">'
+      +'<div class="goal-name">'+g.name+'</div>'
+      +'<div class="eta-pill" style="'+ecls+'">'+etxt+'</div>'
+      +'</div>'
       +'<div class="goal-track"><div class="goal-fill" id="gf_'+g.id+'" style="width:0%"></div></div>'
       +'<div class="goal-meta">'
-        +'<span>'+fE(g.current)+' di '+fE(g.target)+'</span>'
+        +'<span>'+fmtE(g.current)+' di '+fmtE(g.target)+'</span>'
         +'<span>'+pct+'%</span>'
       +'</div>'
-      +'<div style="text-align:right;margin-top:10px">'
+      +'<div class="goal-footer">'
         +'<button class="ghost-btn" onclick="rmGoal('+g.id+')" style="font-size:12px;padding:6px 10px">Rimuovi</button>'
       +'</div>';
     c.appendChild(d);
-    setTimeout((function(id,p){return function(){var f=document.getElementById('gf_'+id);if(f)f.style.width=p+'%';};})(g.id,pct),100);
+    setTimeout((function(id,p){return function(){var f=document.getElementById('gf_'+id);if(f)f.style.width=p+'%';};})(g.id,pct),120);
   });
 }
 
-function addGoal(){
-  var n=(document.getElementById('gName').value||'').trim();
-  var t=parseFloat(document.getElementById('gTarget').value)||0;
-  var cu=parseFloat(document.getElementById('gCurrent').value)||0;
-  var m=parseFloat(document.getElementById('gMonthly').value)||0;
-  if(!n||!t)return;
-  S.goals.push({id:Date.now(),name:n,target:t,current:cu,monthly:m});
-  sv();
-  ['gName','gTarget','gCurrent','gMonthly'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
-  renderGoals();
-}
-
-function rmGoal(id){S.goals=S.goals.filter(function(g){return g.id!==id;});sv();renderGoals();}
-
+/* SETUP */
 function renderSetup(){
   var m={sSaldo:'saldo',sEntrate:'entrate',sVari:'variabili',sRisp:'risparmio'};
   for(var id in m){var el=document.getElementById(id);if(el)el.value=S[m[id]]||'';}
   renderFxList();
+  renderExList();
 }
 
 function renderFxList(){
   var el=document.getElementById('fxList');if(!el)return;
-  if(!S.fixed.length){el.innerHTML='<div style="padding:0 0 4px;font-size:13px;color:var(--color-text-secondary)">Nessun costo fisso aggiunto.</div>';return;}
+  var dv=document.getElementById('fxDiv');
+  if(!S.fixed.length){el.innerHTML='';if(dv)dv.style.display='none';return;}
+  if(dv)dv.style.display='block';
   el.innerHTML=S.fixed.map(function(f){
-    return '<div class="fx-item"><div><div class="fx-name">'+f.cat+' · '+f.name+'</div></div>'
-      +'<div style="display:flex;align-items:center;gap:8px"><div class="fx-amt">-'+fE(f.amt)+'</div>'
-      +'<button class="ghost-btn" onclick="rmFx('+f.id+')" style="font-size:12px;padding:5px 8px">✕</button></div></div>';
+    return '<div class="fx-item">'
+      +'<div><div class="fx-name">'+f.name+'</div><div class="fx-meta">'+f.cat+'</div></div>'
+      +'<div class="fx-right"><div class="fx-amt">-'+fmtE(f.amt)+'</div>'
+      +'<button class="ghost-btn" onclick="rmFx('+f.id+')" style="font-size:12px;padding:5px 9px">✕</button>'
+      +'</div></div>';
   }).join('');
 }
 
-function addFixed(){
-  var n=(document.getElementById('fxName').value||'').trim();
-  var a=parseFloat(document.getElementById('fxAmt').value)||0;
-  var c=document.getElementById('fxCat').value;
-  if(!n||!a)return;
+function addFx(){
+  var n=(document.getElementById('fxN').value||'').trim();
+  var a=parseFloat(document.getElementById('fxA').value)||0;
+  var c=document.getElementById('fxC').value;
+  if(!n||!a){toast('Inserisci nome e importo');return;}
   S.fixed.push({id:Date.now(),name:n,amt:a,cat:c});sv();
-  document.getElementById('fxName').value='';document.getElementById('fxAmt').value='';
+  document.getElementById('fxN').value='';document.getElementById('fxA').value='';
   renderFxList();
+  toast('Costo fisso aggiunto');
 }
 
 function rmFx(id){S.fixed=S.fixed.filter(function(f){return f.id!==id;});sv();renderFxList();}
+
+function renderExList(){
+  var el=document.getElementById('exList');if(!el)return;
+  var dv=document.getElementById('exDiv');
+  if(!S.extras.length){el.innerHTML='';if(dv)dv.style.display='none';return;}
+  if(dv)dv.style.display='block';
+  var FL={'1':'Mensile','3':'Ogni 3 mesi','6':'Semestrale','12':'Annuale'};
+  el.innerHTML=S.extras.map(function(e){
+    return '<div class="fx-item">'
+      +'<div><div class="fx-name">'+e.name+'</div><div class="fx-meta">'+(FL[e.freq]||e.freq)+'</div></div>'
+      +'<div class="fx-right"><div class="fx-amt" style="color:var(--green)">+'+fmtE(e.amt)+'</div>'
+      +'<button class="ghost-btn" onclick="rmEx('+e.id+')" style="font-size:12px;padding:5px 9px">✕</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+function addEx(){
+  var n=(document.getElementById('exN').value||'').trim();
+  var a=parseFloat(document.getElementById('exA').value)||0;
+  var f=document.getElementById('exF').value;
+  if(!n||!a){toast('Inserisci nome e importo');return;}
+  S.extras.push({id:Date.now(),name:n,amt:a,freq:f});sv();
+  document.getElementById('exN').value='';document.getElementById('exA').value='';
+  renderExList();
+  toast('Entrata extra aggiunta');
+}
+
+function rmEx(id){S.extras=S.extras.filter(function(e){return e.id!==id;});sv();renderExList();}
 
 function doSave(){
   S.saldo=parseFloat(document.getElementById('sSaldo').value)||0;
@@ -476,33 +674,52 @@ function doSave(){
   S.risparmio=parseFloat(document.getElementById('sRisp').value)||0;
   sv();
   try{localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));}catch(e){}
-  nav('home');
+  toast('Salvato');
+  setTimeout(function(){nav('home');},600);
 }
 
 function doReset(){
   if(!confirm('Cancellare tutti i dati?'))return;
-  S={saldo:0,entrate:0,variabili:0,risparmio:0,fixed:[],goals:[]};
-  sv();renderSetup();renderHome();
+  S={saldo:0,entrate:0,variabili:0,risparmio:0,fixed:[],extras:[],goals:[]};
+  sv();
+  try{localStorage.removeItem(LK+'_upd');}catch(e){}
+  renderSetup();
+  toast('Dati resettati');
 }
 
+/* TOAST */
+var toastT;
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(function(){el.classList.remove('show');},2000);
+}
+
+/* DEMO */
 function loadDemo(){
   if(!S.saldo&&!S.entrate){
     S.saldo=4827;S.entrate=3200;S.variabili=400;S.risparmio=500;
     S.fixed=[
       {id:1,name:'Affitto',amt:850,cat:'Casa'},
       {id:2,name:'Auto',amt:280,cat:'Auto'},
-      {id:3,name:'Netflix+Spotify',amt:28,cat:'Abb.'},
-      {id:4,name:'Palestra',amt:45,cat:'Salute'}
+      {id:3,name:'Netflix+Spotify',amt:28,cat:'Abbonamenti'},
+      {id:4,name:'Palestra',amt:45,cat:'Salute'},
+      {id:5,name:'Assicurazione',amt:60,cat:'Altro'}
     ];
+    S.extras=[{id:10,name:'Freelance',amt:400,freq:'3'}];
     S.goals=[
-      {id:10,name:'Vacanze',target:1500,current:840,monthly:200},
-      {id:11,name:'Auto nuova',target:8000,current:3200,monthly:300}
+      {id:20,name:'Vacanze',target:1500,current:840,monthly:200},
+      {id:21,name:'Auto nuova',target:8000,current:3200,monthly:300}
     ];
     sv();
   }
-  var upd=localStorage.getItem(LK+'_upd');
-  if(upd)document.getElementById('lastUpdate').textContent='Aggiornato il '+upd;
 }
 
-ld();loadDemo();renderHome();
-</script> 
+/* INIT */
+ld();
+loadDemo();
+renderHome();
+</script>
+</body>
+</html>

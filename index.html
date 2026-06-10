@@ -247,6 +247,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .note-display{font-size:12px;color:var(--muted);font-style:italic;
   background:var(--s2);border-radius:8px;padding:6px 10px;margin-top:4px;line-height:1.4}
 
+/* BUDGET CONSUMATO */
+.budget-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
+  padding:13px;margin-bottom:8px}
+.bg-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.bg-label{font-size:12px;font-weight:600}
+.bg-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.bg-pct{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.bg-track{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;
+  margin-bottom:5px;position:relative}
+.bg-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.bg-marker{position:absolute;top:-4px;width:2px;height:16px;background:var(--text);
+  border-radius:1px;z-index:2}
+.bg-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+
+/* DUAL CHART (entrate vs uscite) */
+.dual-row{display:flex;align-items:flex-end;gap:6px;height:90px;padding:0 2px}
+.dual-group{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%;justify-content:center}
+.dual-bar{width:50%;max-width:18px;border-radius:3px 3px 0 0;min-height:2px}
+.dual-bar.in{background:var(--green)}
+.dual-bar.out{background:var(--red)}
+.dual-lbls{display:flex;gap:6px;margin-top:5px}
+.dual-lbl{flex:1;text-align:center;font-size:10px;color:var(--muted)}
+
 /* GOALS */
 .goal-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
   padding:13px;margin-bottom:8px}
@@ -345,6 +368,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
   <div id="reminderBanner"></div>
   <div id="anomalyBanner"></div>
+
+  <!-- BUDGET CONSUMATO -->
+  <div class="budget-card" id="budgetCard" style="display:none">
+    <div class="bg-head">
+      <div>
+        <div class="bg-label">Budget del mese</div>
+        <div class="bg-sub" id="bgSub">—</div>
+      </div>
+      <div class="bg-pct" id="bgPct">—</div>
+    </div>
+    <div class="bg-track">
+      <div class="bg-fill" id="bgFill" style="width:0%"></div>
+      <div class="bg-marker" id="bgMarker" style="left:50%"></div>
+    </div>
+    <div class="bg-foot">
+      <span id="bgPrevSpese">—</span>
+      <span id="bgPrevPctTime">—</span>
+    </div>
+  </div>
 
   <div class="kgrid">
     <div class="kpi">
@@ -455,6 +497,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="stitle" style="margin-top:4px">Mesi passati</div>
   <div class="card" id="storicoCard">
     <div class="card-body" style="padding:2px 13px 10px" id="storicoList"></div>
+  </div>
+
+  <!-- ENTRATE VS USCITE -->
+  <div id="dualChartSection" style="display:none">
+    <div class="stitle">Entrate vs Uscite</div>
+    <div class="card">
+      <div class="card-body" style="padding:13px">
+        <div class="dual-row" id="dualBars"></div>
+        <div class="dual-lbls" id="dualLabels"></div>
+        <div style="display:flex;gap:14px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)">
+          <div class="leg"><div class="leg-l" style="background:var(--green);width:10px;height:10px;border-radius:2px"></div>Stipendio</div>
+          <div class="leg"><div class="leg-l" style="background:var(--red);width:10px;height:10px;border-radius:2px"></div>Spese</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVOLUZIONE SALDO -->
+  <div id="saldoChartSection" style="display:none">
+    <div class="stitle">Evoluzione saldo bancario</div>
+    <div class="card">
+      <div class="card-body" style="padding:13px">
+        <svg class="chart-svg" id="saldoEvolChart" height="100" viewBox="0 0 340 100"></svg>
+        <div class="ml" id="saldoEvolLabels"></div>
+        <div id="saldoTrendRow" class="trend-row" style="margin-top:8px"></div>
+      </div>
+    </div>
   </div>
 
   <!-- RIEPILOGO ANNO -->
@@ -843,6 +912,7 @@ function renderHome(){
 
   renderTargetSaldo();
   renderTrend();
+  renderBudget();
 }
 
 function renderReminder(){
@@ -924,6 +994,59 @@ function renderWeekly(){
     var di=((today-1-(6-i))+7)%7;
     l.textContent=WD[di].slice(0,1); lbls.appendChild(l);
   });
+}
+
+// ── BUDGET DEL MESE ────────────────────────────────────────
+function renderBudget(){
+  var card=document.getElementById('budgetCard'); if(!card) return;
+  if(!S.spese||S.spese<=0||!S.stipendio){card.style.display='none';return;}
+  card.style.display='block';
+
+  // Calcola la media storica delle spese (solo storico, non mese corrente)
+  var mediaSpese=null;
+  if(S.storico.length>0){
+    mediaSpese=S.storico.reduce(function(a,m){return a+m.spese;},0)/S.storico.length;
+  }
+
+  var now=new Date();
+  var giornoOggi=now.getDate();
+  var giorniMese=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  var pctTempo=Math.round(giornoOggi/giorniMese*100);
+
+  // budget vs stipendio (quanto del tuo stipendio stai pianificando di spendere)
+  var pctBudget=Math.round(S.spese/S.stipendio*100);
+  document.getElementById('bgPct').textContent=pctBudget+'%';
+  document.getElementById('bgSub').textContent='Budget '+fE(S.spese)+' di '+fE(S.stipendio)+' stipendio';
+
+  // confronto con media storica
+  var msg;
+  if(mediaSpese!==null){
+    var diff=S.spese-mediaSpese;
+    if(Math.abs(diff)<mediaSpese*0.05){
+      msg='In linea con la tua media';
+    } else if(diff>0){
+      msg='Budget '+fK(Math.abs(diff))+' sopra la media';
+    } else {
+      msg='Budget '+fK(Math.abs(diff))+' sotto la media';
+    }
+    document.getElementById('bgPrevSpese').textContent=msg;
+  } else {
+    document.getElementById('bgPrevSpese').textContent='Aggiungi storico per confronti';
+  }
+  document.getElementById('bgPrevPctTime').textContent='Giorno '+giornoOggi+' di '+giorniMese;
+
+  // colore: % budget vs stipendio
+  // <60% verde (sano), 60-75% arancione (ok), >75% rosso (alto)
+  var fillCol,pctCol;
+  if(pctBudget>=75){fillCol='var(--red)';pctCol='var(--red)';}
+  else if(pctBudget>=60){fillCol='var(--amber)';pctCol='var(--amber)';}
+  else{fillCol='var(--green)';pctCol='var(--green)';}
+  document.getElementById('bgPct').style.color=pctCol;
+  setTimeout(function(){
+    document.getElementById('bgFill').style.width=Math.min(100,pctBudget)+'%';
+    document.getElementById('bgFill').style.background=fillCol;
+    document.getElementById('bgMarker').style.left=pctTempo+'%';
+  },100);
 }
 
 // ── OBIETTIVO SALDO ────────────────────────────────────────
@@ -1054,6 +1177,112 @@ function renderRiepilogo(){
     +'</div>';
 }
 
+// ── ENTRATE VS USCITE BAR CHART ────────────────────────────
+function renderDualChart(){
+  var section=document.getElementById('dualChartSection');
+  var barsEl=document.getElementById('dualBars');
+  var lblsEl=document.getElementById('dualLabels');
+  if(!section||!barsEl||!lblsEl) return;
+  if(S.storico.length<2){section.style.display='none';return;}
+  section.style.display='block';
+  // limita a ultimi 12 mesi
+  var data=S.storico.slice(-12);
+  var maxVal=Math.max.apply(null,data.map(function(m){return Math.max(m.stip,m.spese);}));
+  maxVal=maxVal||1;
+  barsEl.innerHTML='';
+  lblsEl.innerHTML='';
+  data.forEach(function(m,i){
+    var hStip=Math.round(m.stip/maxVal*86);
+    var hSpese=Math.round(m.spese/maxVal*86);
+    var g=document.createElement('div'); g.className='dual-group';
+    g.innerHTML='<div class="dual-bar in" id="db_in_'+i+'" style="height:0px"></div>'
+      +'<div class="dual-bar out" id="db_out_'+i+'" style="height:0px"></div>';
+    barsEl.appendChild(g);
+    var l=document.createElement('div'); l.className='dual-lbl';
+    l.textContent=MI[m.mi]; lblsEl.appendChild(l);
+    setTimeout((function(idx,hi,ho){return function(){
+      var bi=document.getElementById('db_in_'+idx);
+      var bo=document.getElementById('db_out_'+idx);
+      if(bi){bi.style.transition='height .7s cubic-bezier(.22,1,.36,1)';bi.style.height=hi+'px';}
+      if(bo){bo.style.transition='height .7s cubic-bezier(.22,1,.36,1) .05s';bo.style.height=ho+'px';}
+    };})(i,hStip,hSpese),i*60+100);
+  });
+}
+
+// ── EVOLUZIONE SALDO BANCARIO ──────────────────────────────
+function renderSaldoEvol(){
+  var section=document.getElementById('saldoChartSection');
+  var svg=document.getElementById('saldoEvolChart');
+  var lblsEl=document.getElementById('saldoEvolLabels');
+  var trendEl=document.getElementById('saldoTrendRow');
+  if(!section||!svg||!lblsEl||!trendEl) return;
+  // filtra solo mesi con saldo inserito (NaN/null escluso, ma 0 è valido)
+  var data=S.storico.filter(function(m){return m.saldo!==null&&m.saldo!==undefined&&!isNaN(m.saldo);}).slice(-12);
+  if(data.length<2){section.style.display='none';return;}
+  section.style.display='block';
+  // disegna linea
+  svg.innerHTML='';
+  var W=340,H=100,px=8,py=10;
+  var vals=data.map(function(m){return m.saldo;});
+  var mn=Math.min.apply(null,vals);
+  var mx=Math.max.apply(null,vals);
+  var rng=mx-mn||1;
+  function sx(i){return px+i*(W-px*2)/(data.length-1);}
+  function sy(v){return H-py-((v-mn)/rng)*(H-py*2);}
+  // soglia line
+  if(S.soglia&&S.soglia>=mn&&S.soglia<=mx){
+    svg.appendChild(svgEl('line',{x1:0,y1:sy(S.soglia).toFixed(1),x2:W,y2:sy(S.soglia).toFixed(1),
+      stroke:'var(--amber)','stroke-width':'1','stroke-dasharray':'3 2',opacity:'.5'}));
+    var soglialbl=svgEl('text',{x:W-4,y:sy(S.soglia).toFixed(1)-3,'text-anchor':'end',
+      'font-size':'9','fill':'var(--amber)','font-family':'Inter'});
+    soglialbl.textContent='soglia '+fK(S.soglia);
+    svg.appendChild(soglialbl);
+  }
+  // gradient
+  var defs=svgEl('defs',{});
+  var g=svgEl('linearGradient',{id:'gSaldoEvol',x1:'0',y1:'0',x2:'0',y2:'1'});
+  g.appendChild(svgEl('stop',{'offset':'0%','stop-color':'var(--text)','stop-opacity':'.12'}));
+  g.appendChild(svgEl('stop',{'offset':'100%','stop-color':'var(--text)','stop-opacity':'0'}));
+  defs.appendChild(g); svg.appendChild(defs);
+  var pts=data.map(function(m,i){return sx(i).toFixed(1)+','+sy(m.saldo).toFixed(1);}).join(' L');
+  svg.appendChild(svgEl('path',{d:'M'+pts+' L'+sx(data.length-1).toFixed(1)+','+H+' L'+sx(0).toFixed(1)+','+H+' Z',
+    fill:'url(#gSaldoEvol)'}));
+  // dots
+  data.forEach(function(m,i){
+    var col=m.saldo>=S.soglia?'var(--green)':'var(--red)';
+    svg.appendChild(svgEl('circle',{cx:sx(i).toFixed(1),cy:sy(m.saldo).toFixed(1),r:'4',
+      fill:col,stroke:'var(--surface)','stroke-width':'1.5'}));
+  });
+  // line
+  var lp=svgEl('path',{d:'M'+pts,fill:'none',stroke:'var(--text)','stroke-width':'2',
+    'stroke-linecap':'round','stroke-linejoin':'round'});
+  var len=W*1.4; lp.style.strokeDasharray=len; lp.style.strokeDashoffset=len;
+  lp.style.transition='stroke-dashoffset 1s cubic-bezier(.22,1,.36,1) .1s';
+  svg.appendChild(lp);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){lp.style.strokeDashoffset='0';});});
+  // labels
+  lblsEl.innerHTML='';
+  var steps=Math.min(5,data.length);
+  for(var i=0;i<steps;i++){
+    var idx=Math.round(i*(data.length-1)/(steps-1));
+    var s=document.createElement('span');
+    s.textContent=MI[data[idx].mi];
+    lblsEl.appendChild(s);
+  }
+  // trend
+  var primo=data[0].saldo;
+  var ultimo=data[data.length-1].saldo;
+  var delta=ultimo-primo;
+  var pctVar=primo>0?Math.round(delta/primo*100):0;
+  var arrowUp=delta>=0;
+  var col=arrowUp?'var(--green)':'var(--red)';
+  var arrow=arrowUp?'▲':'▼';
+  var msg=arrowUp?'Patrimonio in crescita':'Patrimonio in calo';
+  trendEl.innerHTML='<div class="trend-arrow" style="color:'+col+'">'+arrow+'</div>'
+    +'<div class="trend-label" style="color:'+col+'">'+msg+' su '+data.length+' mesi</div>'
+    +'<div class="trend-val" style="color:'+col+'">'+(arrowUp?'+':'')+fS(delta)+' ('+(arrowUp?'+':'')+pctVar+'%)</div>';
+}
+
 // ── STORICO ────────────────────────────────────────────────
 function addMese(){
   var mi=parseInt(document.getElementById('stM').value);
@@ -1135,6 +1364,8 @@ function renderStorico(){
     var bw=Math.min(100,Math.abs(saved)/maxS*100);
     setTimeout((function(idx,w){return function(){var b=document.getElementById('mb'+idx);if(b)b.style.width=w+'%';};})(i,bw),i*50+80);
   });
+  renderDualChart();
+  renderSaldoEvol();
   renderRiepilogo();
 }
 

@@ -323,6 +323,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 /* EMPTY */
 .empty{text-align:center;padding:22px 14px;color:var(--muted);font-size:13px;line-height:1.6}
 
+/* CUSTOM CONFIRM DIALOG */
+#confirmOverlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;
+  display:none;align-items:flex-end;justify-content:center;
+  padding:0 0 calc(var(--safe-bot) + 12px)}
+#confirmOverlay.open{display:flex}
+#confirmBox{background:var(--surface);border-radius:16px 16px 12px 12px;
+  width:100%;max-width:430px;overflow:hidden}
+#confirmMsg{padding:20px 20px 14px;font-size:15px;font-weight:500;
+  text-align:center;line-height:1.5;color:var(--text)}
+#confirmMsgSub{padding:0 20px 16px;font-size:13px;color:var(--muted);
+  text-align:center;line-height:1.4}
+.confirm-btn-row{display:flex;flex-direction:column;gap:0;
+  border-top:.5px solid var(--border)}
+.confirm-btn{width:100%;padding:14px;font-size:16px;font-weight:500;
+  background:none;border:none;cursor:pointer;
+  border-bottom:.5px solid var(--border)}
+.confirm-btn:last-child{border-bottom:none}
+.confirm-btn.destructive{color:var(--red);font-weight:600}
+.confirm-btn.cancel{color:var(--muted)}
+
 /* TOAST */
 #toast{position:fixed;bottom:calc(var(--safe-bot) + 18px);left:50%;
   transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);
@@ -410,6 +430,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="kpi-l">Proiezione 12m</div>
       <div class="kpi-v" id="kProj">—</div>
       <div class="kpi-n">saldo tra 1 anno</div>
+    </div>
+  </div>
+
+  <!-- WATERFALL: DOVE VA LO STIPENDIO -->
+  <div class="card" id="waterfallCard" style="display:none">
+    <div class="card-head">
+      <span class="ch-t">Dove va lo stipendio</span>
+      <span class="ch-s" id="wfNote">struttura mensile</span>
+    </div>
+    <div class="card-body" style="padding:13px 8px 6px">
+      <svg class="chart-svg" id="waterfallChart" height="128" viewBox="0 0 340 128"></svg>
     </div>
   </div>
 
@@ -574,6 +605,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <div class="stitle" style="margin:0">Prossimi 12 mesi</div>
     <div style="font-size:11px;color:var(--muted)" id="pianoBase"></div>
   </div>
+
+  <!-- TRAIETTORIA -->
+  <div class="card" id="pianoChartCard">
+    <div class="card-body" style="padding:13px 13px 8px">
+      <svg class="chart-svg" id="pianoChart" height="104" viewBox="0 0 340 104"></svg>
+      <div class="ml" id="pianoML"></div>
+      <div style="display:flex;gap:12px;margin-top:7px;padding-top:7px;border-top:.5px solid var(--border)">
+        <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>OK</div>
+        <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div>Sotto soglia</div>
+        <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div>In rosso</div>
+        <div class="leg"><div style="width:11px;height:11px;border-radius:50%;background:var(--s3);border:2px solid var(--text)"></div>Con eventi</div>
+      </div>
+    </div>
+  </div>
+
   <div id="pianoList"></div>
 
   <!-- event form -->
@@ -694,11 +740,35 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 
   <button class="pri-btn" onclick="doSave()" style="margin-bottom:9px">Salva e aggiorna</button>
+
+  <div class="stitle">Backup dati</div>
+  <div class="fc">
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px">
+      I dati vivono nel browser. Esporta un backup periodico per non perderli mai.
+      L'ultimo backup è del <strong id="lastBackup">mai</strong>.
+    </div>
+    <button class="pri-btn" onclick="exportBackup()" style="background:var(--s2);color:var(--text);border:.5px solid var(--border2);margin-top:0;margin-bottom:8px">📤 Esporta backup</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importBackup(event)">
+    <button class="pri-btn" onclick="document.getElementById('importFile').click()" style="background:var(--s2);color:var(--text);border:.5px solid var(--border2);margin-top:0">📥 Ripristina backup</button>
+  </div>
+
   <button class="sec-btn" onclick="doReset()" style="margin-bottom:30px">Reset tutti i dati</button>
 </div>
 
 </div><!-- /scroll -->
 </div><!-- /app -->
+
+<!-- CUSTOM CONFIRM DIALOG -->
+<div id="confirmOverlay">
+  <div id="confirmBox">
+    <div id="confirmMsg"></div>
+    <div id="confirmMsgSub"></div>
+    <div class="confirm-btn-row">
+      <button class="confirm-btn destructive" id="confirmOk">Conferma</button>
+      <button class="confirm-btn cancel" onclick="closeConfirm()">Annulla</button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -738,11 +808,12 @@ function projectBase(saldo, rispMese){
 }
 
 // ── PROJECT PIANO (with events) ────────────────────────────
-function projectPiano(){
+function projectPiano(opts){
+  opts=opts||{};
   var now=new Date();
   var media=mediaRisp();
-  var rispBase=media!==null?media:(S.stipendio-S.spese);
-  var saldo=S.saldo;
+  var rispBase=opts.risp!==undefined?opts.risp:(media!==null?media:(S.stipendio-S.spese));
+  var saldo=opts.saldo!==undefined?opts.saldo:S.saldo;
   var res=[];
   for(var m=0;m<12;m++){
     var mi=(now.getMonth()+m)%12;
@@ -913,6 +984,7 @@ function renderHome(){
   renderTargetSaldo();
   renderTrend();
   renderBudget();
+  renderWaterfall();
 }
 
 function renderReminder(){
@@ -1047,6 +1119,85 @@ function renderBudget(){
     document.getElementById('bgFill').style.background=fillCol;
     document.getElementById('bgMarker').style.left=pctTempo+'%';
   },100);
+}
+
+// ── WATERFALL: DOVE VA LO STIPENDIO ────────────────────────
+function renderWaterfall(){
+  var card=document.getElementById('waterfallCard');
+  var svg=document.getElementById('waterfallChart');
+  if(!card||!svg) return;
+  if(!S.stipendio||S.stipendio<=0){card.style.display='none';return;}
+  card.style.display='block';
+  svg.innerHTML='';
+  var W=340,H=128;
+  var tfTot=tfx();
+  // costruisci le voci: stipendio, ogni costo fisso, variabili, risparmio
+  var voci=[{label:'Stipendio',val:S.stipendio,type:'in'}];
+  // aggrega costi fissi - se troppi (>4), raggruppa i più piccoli
+  var fixed=S.fixed.slice().sort(function(a,b){return b.amt-a.amt;});
+  var maxFixed=4;
+  if(fixed.length<=maxFixed){
+    fixed.forEach(function(f){voci.push({label:f.name,val:f.amt,type:'out'});});
+  } else {
+    fixed.slice(0,maxFixed-1).forEach(function(f){voci.push({label:f.name,val:f.amt,type:'out'});});
+    var altri=fixed.slice(maxFixed-1).reduce(function(a,f){return a+f.amt;},0);
+    voci.push({label:'Altri fissi',val:altri,type:'out'});
+  }
+  if(S.variabili>0) voci.push({label:'Variabili',val:S.variabili,type:'out'});
+  var risp=S.stipendio-tfTot-S.variabili;
+  voci.push({label:'Risparmio',val:Math.abs(risp),type:risp>=0?'save':'deficit'});
+  // calcola scale
+  var maxVal=S.stipendio;
+  var padX=10,padY=6,barTop=8;
+  var n=voci.length;
+  var availW=W-padX*2;
+  var gap=4;
+  var barW=(availW-gap*(n-1))/n;
+  var barAreaH=H-padY-barTop-22; // 22 per labels sotto
+  // soglia per mostrare il valore: solo barre alte abbastanza
+  voci.forEach(function(v,i){
+    var hh=Math.round((v.val/maxVal)*barAreaH);
+    if(hh<2) hh=2;
+    var x=padX+i*(barW+gap);
+    var y=padY+barTop+(barAreaH-hh);
+    var col;
+    if(v.type==='in') col='var(--green)';
+    else if(v.type==='save') col=risp>=0?'var(--blue)':'var(--red)';
+    else if(v.type==='deficit') col='var(--red)';
+    else col='var(--red)';
+    // bar with rounded top
+    var rect=svgEl('rect',{x:x.toFixed(1),y:(y+hh).toFixed(1),width:barW.toFixed(1),
+      height:'0',rx:'3',fill:col,opacity:'.92'});
+    svg.appendChild(rect);
+    setTimeout((function(r,yy,hhh){return function(){
+      r.style.transition='y .6s cubic-bezier(.22,1,.36,1), height .6s cubic-bezier(.22,1,.36,1)';
+      r.setAttribute('y',yy.toFixed(1));
+      r.setAttribute('height',hhh.toFixed(1));
+    };})(rect,y,hh),60+i*55);
+    // valore sopra la barra
+    var valTxt=svgEl('text',{x:(x+barW/2).toFixed(1),y:(y-3).toFixed(1),
+      'text-anchor':'middle','font-size':'10','font-weight':'600',
+      fill:col,'font-family':'Inter'});
+    valTxt.textContent=fK(v.val);
+    valTxt.style.opacity='0';
+    valTxt.style.transition='opacity .3s ease '+(0.25+i*0.05)+'s';
+    svg.appendChild(valTxt);
+    setTimeout(function(){valTxt.style.opacity='1';},100);
+    // label sotto
+    var lbl=svgEl('text',{x:(x+barW/2).toFixed(1),y:(H-10).toFixed(1),
+      'text-anchor':'middle','font-size':'9.5',
+      fill:'var(--muted)','font-family':'Inter'});
+    var labelText=v.label;
+    if(labelText.length>9) labelText=labelText.substring(0,8)+'.';
+    lbl.textContent=labelText;
+    svg.appendChild(lbl);
+  });
+  // nota
+  var noteEl=document.getElementById('wfNote');
+  if(noteEl){
+    if(risp>=0) noteEl.textContent='Ti restano '+fE(risp);
+    else noteEl.textContent='Deficit di '+fE(-risp);
+  }
 }
 
 // ── OBIETTIVO SALDO ────────────────────────────────────────
@@ -1296,19 +1447,26 @@ function addMese(){
   // se esiste già un mese con stesso mi+anno, chiedi conferma
   var exists=S.storico.find(function(m){return m.mi===mi&&m.anno===anno;});
   if(exists){
-    if(!confirm('Esiste già '+MIF[mi]+' '+anno+'. Sovrascriverlo?'))return;
+    showConfirm('Aggiornare '+MIF[mi]+' '+anno+'?','I dati esistenti verranno sostituiti.',function(){
+      _doSaveMese(mi,anno,stip,spese,saldo,nota,true);
+    });
+    return;
   }
+  _doSaveMese(mi,anno,stip,spese,saldo,nota,false);
+}
+function _doSaveMese(mi,anno,stip,spese,saldo,nota,isUpdate){
   S.storico=S.storico.filter(function(m){return !(m.mi===mi&&m.anno===anno);});
   S.storico.push({mi:mi,anno:anno,stip:stip,spese:spese,saldo:saldo,nota:nota});
   S.storico.sort(function(a,b){return a.anno!==b.anno?a.anno-b.anno:a.mi-b.mi;});
   sv();
   ['stSt','stSp','stSa','stNota'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   renderStorico();
-  toast(exists?'Mese aggiornato':'Mese salvato');
+  toast(isUpdate?'Mese aggiornato':'Mese salvato');
 }
 function rmMese(idx){
-  if(!confirm('Eliminare questo mese?'))return;
-  S.storico.splice(idx,1);sv();renderStorico();
+  showConfirm('Eliminare questo mese?','',function(){
+    S.storico.splice(idx,1);sv();renderStorico();
+  });
 }
 function editMese(idx){
   var m=S.storico[idx]; if(!m) return;
@@ -1377,6 +1535,63 @@ function renderPiano(){
   var media=mediaRisp();
   var baseLabel=media!==null?'Base: media '+fK(media)+'/mese':'Base: stima '+fK(S.stipendio-S.spese)+'/mese';
   document.getElementById('pianoBase').textContent=baseLabel;
+
+  // ── grafico traiettoria ──
+  var chSvg=document.getElementById('pianoChart');
+  if(chSvg){
+    chSvg.innerHTML='';
+    var W=340,H=104,px=10,py=12;
+    var vals=data.map(function(d){return d.sl;});
+    var mn=Math.min.apply(null,vals.concat([S.soglia]));
+    var mx=Math.max.apply(null,vals.concat([S.soglia]));
+    var rng=mx-mn||1;
+    var sxP=function(i){return px+i*(W-px*2)/(data.length-1);};
+    var syP=function(v){return H-py-((v-mn)/rng)*(H-py*2);};
+    // linea soglia
+    chSvg.appendChild(svgEl('line',{x1:0,y1:syP(S.soglia).toFixed(1),x2:W,y2:syP(S.soglia).toFixed(1),
+      stroke:'var(--amber)','stroke-width':'1','stroke-dasharray':'3 2',opacity:'.55'}));
+    var sgLbl=svgEl('text',{x:W-4,y:(syP(S.soglia)-3).toFixed(1),'text-anchor':'end',
+      'font-size':'9','fill':'var(--amber)','font-family':'Inter'});
+    sgLbl.textContent='soglia '+fK(S.soglia);
+    chSvg.appendChild(sgLbl);
+    // zero line se serve
+    if(mn<0&&mx>0){
+      chSvg.appendChild(svgEl('line',{x1:0,y1:syP(0).toFixed(1),x2:W,y2:syP(0).toFixed(1),
+        stroke:'var(--red)','stroke-width':'0.5','stroke-dasharray':'3 2',opacity:'.4'}));
+    }
+    // area
+    var defsP=svgEl('defs',{});
+    var gP=svgEl('linearGradient',{id:'gPiano',x1:'0',y1:'0',x2:'0',y2:'1'});
+    gP.appendChild(svgEl('stop',{'offset':'0%','stop-color':'var(--text)','stop-opacity':'.1'}));
+    gP.appendChild(svgEl('stop',{'offset':'100%','stop-color':'var(--text)','stop-opacity':'0'}));
+    defsP.appendChild(gP); chSvg.appendChild(defsP);
+    var ptsP=data.map(function(d,i){return sxP(i).toFixed(1)+','+syP(d.sl).toFixed(1);}).join(' L');
+    chSvg.appendChild(svgEl('path',{d:'M'+ptsP+' L'+sxP(data.length-1).toFixed(1)+','+H+' L'+sxP(0).toFixed(1)+','+H+' Z',
+      fill:'url(#gPiano)'}));
+    // linea
+    var lpP=svgEl('path',{d:'M'+ptsP,fill:'none',stroke:'var(--text)','stroke-width':'2',
+      'stroke-linecap':'round','stroke-linejoin':'round'});
+    var lenP=W*1.4; lpP.style.strokeDasharray=lenP; lpP.style.strokeDashoffset=lenP;
+    lpP.style.transition='stroke-dashoffset 1s cubic-bezier(.22,1,.36,1) .1s';
+    chSvg.appendChild(lpP);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){lpP.style.strokeDashoffset='0';});});
+    // punti: colore stato, più grandi con eventi
+    data.forEach(function(d,i){
+      var dotC=d.sl<0?'var(--red)':d.sl<S.soglia?'var(--amber)':'var(--green)';
+      var hasEv=d.eventi&&d.eventi.length>0;
+      chSvg.appendChild(svgEl('circle',{cx:sxP(i).toFixed(1),cy:syP(d.sl).toFixed(1),
+        r:hasEv?'5.5':'3.5',fill:dotC,stroke:hasEv?'var(--text)':'var(--surface)',
+        'stroke-width':hasEv?'2':'1.5'}));
+    });
+    // labels mesi
+    var mlP=document.getElementById('pianoML');
+    if(mlP){
+      mlP.innerHTML='';
+      [0,3,6,9,11].forEach(function(i){
+        var s=document.createElement('span');s.textContent=MI[data[i].mi];mlP.appendChild(s);
+      });
+    }
+  }
 
   var maxAbs=Math.max.apply(null,data.map(function(d){return Math.abs(d.sl);}));
   maxAbs=maxAbs||1;
@@ -1479,8 +1694,10 @@ function simUpd(){
   var media=mediaRisp();
   var rb=media!==null?media:(S.stipendio-S.spese);
   var rs=rb-men;
-  var base=projectBase(S.saldo,rb);
-  var scen=projectBase(S.saldo-acq,rs);
+  // usa projectPiano: include gli eventi pianificati (coerente con Pianifica)
+  var base=projectPiano();
+  var scen=projectPiano({saldo:S.saldo-acq,risp:rs});
+  var hasEvents=S.piano.some(function(p){return p.eventi&&p.eventi.length>0;});
   var diff=scen[11].sl-base[11].sl;
   var minS=scen.reduce(function(a,b){return a.sl<b.sl?a:b;});
   var ok=minS.sl>0&&scen.every(function(d){return d.sl>0;});
@@ -1494,7 +1711,7 @@ function simUpd(){
   } else if(ok&&!tight){
     ans.style.cssText='border-radius:14px;padding:15px;text-align:center;margin-bottom:8px;background:var(--gbg)';
     ans.innerHTML='<div class="sim-v" style="color:var(--green)">Sì, puoi permettertelo</div>'
-      +'<div class="sim-d" style="color:var(--green)">Il saldo rimane positivo per tutti i 12 mesi.</div>'
+      +'<div class="sim-d" style="color:var(--green)">Il saldo rimane positivo per tutti i 12 mesi'+(hasEvents?', eventi pianificati inclusi':'')+'.</div>'
       +'<div class="sim-b">Impatto a 12 mesi: '+(diff>=0?'+':'')+fK(diff)+'</div>';
   } else if(tight){
     ans.style.cssText='border-radius:14px;padding:15px;text-align:center;margin-bottom:8px;background:var(--abg)';
@@ -1567,6 +1784,7 @@ function renderSetup(){
   var m={sSt:'stipendio',sSp:'spese',sSa:'saldo',sSog:'soglia',sTarget:'targetSaldo'};
   for(var id in m){var e=document.getElementById(id);if(e)e.value=S[m[id]]||'';}
   renderFxList();
+  updateBackupLabel();
 }
 function renderFxList(){
   var el=document.getElementById('fxList'); if(!el) return;
@@ -1599,14 +1817,91 @@ function doSave(){
   toast('Salvato');
   setTimeout(function(){nav('home');},500);
 }
-function doReset(){
-  if(!confirm('Cancellare tutti i dati?'))return;
-  S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,fixed:[],storico:[],goals:[],piano:[]};
-  sv();try{localStorage.removeItem(LK+'_upd');}catch(e){}
-  renderSetup(); toast('Reset effettuato');
+function exportBackup(){
+  try{
+    var data={app:'flusso2',version:1,exported:new Date().toISOString(),state:S};
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var d=new Date();
+    var stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var a=document.createElement('a');
+    a.href=url;
+    a.download='flusso2-backup-'+stamp+'.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    try{localStorage.setItem(LK+'_lastBackup',new Date().toLocaleDateString('it-IT'));}catch(e){}
+    updateBackupLabel();
+    toast('Backup esportato');
+  }catch(e){toast('Errore export');}
 }
 
-// TOAST
+function importBackup(ev){
+  var file=ev.target.files&&ev.target.files[0];
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var obj=JSON.parse(e.target.result);
+      if(!obj||!obj.state||obj.app!=='flusso2'){
+        toast('File non valido');return;
+      }
+      showConfirm('Ripristinare il backup?','I dati attuali verranno sovrascritti.',function(){
+        Object.assign(S,{stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
+          fixed:[],storico:[],goals:[],piano:[]},obj.state);
+        sv();
+        renderSetup();
+        toast('Backup ripristinato');
+        setTimeout(function(){nav('home');},500);
+      });
+    }catch(err){toast('File corrotto');}
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function updateBackupLabel(){
+  try{
+    var lb=localStorage.getItem(LK+'_lastBackup');
+    var el=document.getElementById('lastBackup');
+    if(el) el.textContent=lb||'mai';
+  }catch(e){}
+}
+
+function doReset(){
+  showConfirm('Reset tutti i dati','Questa azione è irreversibile. Tutto verrà cancellato.',function(){
+    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,fixed:[],storico:[],goals:[],piano:[]};
+    sv();try{localStorage.removeItem(LK+'_upd');}catch(e){}
+    renderSetup(); toast('Reset effettuato');
+  });
+}
+
+// ── CUSTOM CONFIRM ─────────────────────────────────────────
+var _confirmCb=null;
+function showConfirm(msg, sub, cb){
+  _confirmCb=cb;
+  document.getElementById('confirmMsg').textContent=msg;
+  var subEl=document.getElementById('confirmMsgSub');
+  subEl.textContent=sub||'';
+  subEl.style.display=sub?'block':'none';
+  document.getElementById('confirmOk').onclick=function(){
+    var cb=_confirmCb;
+    closeConfirm();
+    if(cb) cb();
+  };
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirmOverlay').classList.remove('open');
+  _confirmCb=null;
+}
+// chiudi toccando lo sfondo
+document.getElementById('confirmOverlay').addEventListener('touchstart',function(e){
+  if(e.target===this) closeConfirm();
+});
+
+// ── TOAST ───────────────────────────────────────────────────
 var toastT;
 function toast(msg){
   var el=document.getElementById('toast');

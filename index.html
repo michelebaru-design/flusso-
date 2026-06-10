@@ -201,6 +201,52 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .leg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
 .leg-l{width:14px;height:2px;border-radius:1px}
 
+/* TREND */
+.trend-row{display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;
+  border-top:.5px solid var(--border)}
+.trend-arrow{font-size:18px;line-height:1}
+.trend-label{font-size:12px;color:var(--muted)}
+.trend-val{font-size:13px;font-weight:600;margin-left:auto}
+
+/* RIEPILOGO ANNO */
+.riepilogo{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
+  padding:13px;margin-bottom:8px}
+.rp-title{font-size:13px;font-weight:600;margin-bottom:12px}
+.rp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rp-item{background:var(--s2);border-radius:10px;padding:10px 11px}
+.rp-l{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:3px}
+.rp-v{font-size:17px;font-weight:700;letter-spacing:-.4px}
+.rp-n{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* SOGLIA ALERT PIANIFICA */
+.soglia-alert{border-radius:10px;padding:9px 11px;margin-top:6px;
+  font-size:12px;font-weight:500;line-height:1.4}
+
+/* OBIETTIVO SALDO */
+.target-saldo-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
+  padding:13px;margin-bottom:8px}
+.ts-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ts-label{font-size:13px;font-weight:600}
+.ts-eta{font-size:13px;font-weight:600;color:var(--green)}
+.ts-track{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:5px;
+  position:relative}
+.ts-fill{height:100%;border-radius:3px;background:var(--green);
+  transition:width 1s cubic-bezier(.22,1,.36,1)}
+.ts-target-line{position:absolute;right:0;top:-4px;width:2px;height:14px;
+  background:var(--text);border-radius:1px}
+.ts-foot{display:flex;justify-content:space-between}
+.ts-foot span{font-size:10px;color:var(--muted)}
+
+/* NOTE MESE */
+.note-row{margin-top:6px}
+.note-input{width:100%;background:var(--s2);border:.5px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:13px;padding:7px 10px;
+  outline:none;font-family:inherit;resize:none;transition:border-color .15s}
+.note-input:focus{border-color:var(--text)}
+.note-display{font-size:12px;color:var(--muted);font-style:italic;
+  background:var(--s2);border-radius:8px;padding:6px 10px;margin-top:4px;line-height:1.4}
+
 /* GOALS */
 .goal-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
   padding:13px;margin-bottom:8px}
@@ -374,6 +420,34 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <span class="upd-note" id="lastUpd">Mai aggiornato</span>
     <button class="link-btn" onclick="nav('setup')">Aggiorna →</button>
   </div>
+
+  <!-- OBIETTIVO SALDO -->
+  <div class="stitle">Obiettivo saldo</div>
+  <div class="target-saldo-card" id="targetSaldoCard">
+    <div class="ts-head">
+      <div>
+        <div class="ts-label" id="tsLabel">Imposta un obiettivo in Setup</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px" id="tsNote"></div>
+      </div>
+      <div class="ts-eta" id="tsEta"></div>
+    </div>
+    <div class="ts-track">
+      <div class="ts-fill" id="tsFill" style="width:0%"></div>
+    </div>
+    <div class="ts-foot">
+      <span id="tsCur">—</span>
+      <span id="tsTgt">—</span>
+    </div>
+  </div>
+
+  <!-- TREND RISPARMIO -->
+  <div class="stitle">Trend risparmio</div>
+  <div class="card" id="trendCard">
+    <div class="card-body" style="padding-bottom:8px">
+      <svg class="chart-svg" id="trendChart" height="70" viewBox="0 0 340 70"></svg>
+      <div id="trendRow" class="trend-row"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ STORICO ════════════════════════════════════════════ -->
@@ -382,6 +456,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="card" id="storicoCard">
     <div class="card-body" style="padding:2px 13px 10px" id="storicoList"></div>
   </div>
+
+  <!-- RIEPILOGO ANNO -->
+  <div id="riepilogoAnno"></div>
 
   <div class="stitle">Aggiungi / modifica mese</div>
   <div class="fc">
@@ -411,6 +488,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <div class="frow full">
       <div class="field"><label>Saldo bancario a fine mese €</label>
         <input type="number" id="stSa" placeholder="8000" inputmode="decimal">
+      </div>
+    </div>
+    <div class="frow full">
+      <div class="field"><label>Nota (opzionale)</label>
+        <input type="text" id="stNota" placeholder="Es. mese alto per vacanze" maxlength="60">
       </div>
     </div>
     <button class="pri-btn" onclick="addMese()">Salva mese</button>
@@ -520,6 +602,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
+  <div class="stitle">Obiettivo saldo bancario</div>
+  <div class="fc">
+    <div class="frow full">
+      <div class="field"><label>Voglio arrivare a €</label>
+        <input type="number" id="sTarget" placeholder="15000" inputmode="decimal">
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px">
+      L'app calcolerà in che mese raggiungi questo saldo basandosi sulla tua media storica reale.
+    </div>
+  </div>
+
   <div class="stitle">Costi fissi mensili</div>
   <div class="fc">
     <div id="fxList" style="margin-bottom:4px"></div>
@@ -546,9 +640,9 @@ var LK='flusso2_v2';
 var TABS=['home','storico','pianifica','simula','goals','setup'];
 
 var S={
-  stipendio:0,spese:0,saldo:0,soglia:2000,
+  stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
   fixed:[],storico:[],goals:[],
-  piano:[] // {mi, anno, eventi:[{name,amt,tipo}]}
+  piano:[]
 };
 
 function sv(){try{localStorage.setItem(LK,JSON.stringify(S));}catch(e){}}
@@ -583,7 +677,7 @@ function projectPiano(){
   var res=[];
   for(var m=0;m<12;m++){
     var mi=(now.getMonth()+m)%12;
-    var anno=now.getFullYear()+(now.getMonth()+m>=12?1:0);
+    var anno=now.getFullYear()+Math.floor((now.getMonth()+m)/12);
     // trova piano di questo mese
     var piano=null;
     for(var i=0;i<S.piano.length;i++){
@@ -685,9 +779,9 @@ function renderHome(){
   kn.style.color=netto>=0?'var(--green)':'var(--red)';
   var kt=document.getElementById('kTasso');
   kt.textContent=S.stipendio>0?fPct(tasso):'—';
-  kt.style.color=tasso>=20?'var(--green)':tasso>=10?'var(--amber)':'var(--red)';
+  kt.style.color=S.stipendio===0?'var(--muted)':tasso>=20?'var(--green)':tasso>=10?'var(--amber)':'var(--red)';
   document.getElementById('kTassoN').textContent=
-    tasso>=20?'ottimo ≥20%':tasso>=10?'nella norma':'sotto 10%';
+    S.stipendio===0?'dello stipendio':tasso>=20?'ottimo ≥20%':tasso>=10?'nella norma':'sotto 10%';
   var km=document.getElementById('kMedia');
   km.textContent=media!==null?fK(media):'—';
   km.style.color=media!==null&&media<0?'var(--red)':'var(--text)';
@@ -721,10 +815,13 @@ function renderHome(){
   renderWeekly();
 
   // chart
+  var svgHC=document.getElementById('homeChart');
+  if(svgHC) svgHC.innerHTML='';
   if(S.stipendio>0){
-    var svg=document.getElementById('homeChart');
-    if(svg){svg.innerHTML='';drawLine('homeChart',proj,340,88,null,false,'hc');}
+    if(svgHC) drawLine('homeChart',proj,340,88,null,false,'hc');
     setML('homeML',proj);
+  } else {
+    var mlHC=document.getElementById('homeML'); if(mlHC) mlHC.innerHTML='';
   }
 
   // status
@@ -743,6 +840,9 @@ function renderHome(){
 
   try{var u=localStorage.getItem(LK+'_upd');
     if(u)document.getElementById('lastUpd').textContent='Aggiornato il '+u;}catch(e){}
+
+  renderTargetSaldo();
+  renderTrend();
 }
 
 function renderReminder(){
@@ -805,7 +905,7 @@ function renderWeekly(){
   var media7=Math.round(spGiorno*7);
   var diff=tot-media7;
   var sett=Math.ceil(now.getDate()/7);
-  document.getElementById('wkSub').textContent='Settimana '+sett+' · '+MI[now.getMonth()];
+  document.getElementById('wkSub').textContent='Settimana '+sett+' · '+MI[now.getMonth()]+' · stima';
   var wn=document.getElementById('wkNum');
   wn.textContent=fE(tot); wn.style.color=diff>0?'var(--red)':'var(--green)';
   var wv=document.getElementById('wkVs');
@@ -826,6 +926,134 @@ function renderWeekly(){
   });
 }
 
+// ── OBIETTIVO SALDO ────────────────────────────────────────
+function renderTargetSaldo(){
+  var card=document.getElementById('targetSaldoCard'); if(!card) return;
+  var target=S.targetSaldo||0;
+  if(!target||!S.saldo){
+    document.getElementById('tsLabel').textContent='Imposta un obiettivo in Setup';
+    document.getElementById('tsNote').textContent='';
+    document.getElementById('tsEta').textContent='';
+    document.getElementById('tsFill').style.width='0%';
+    document.getElementById('tsCur').textContent='—';
+    document.getElementById('tsTgt').textContent='—';
+    return;
+  }
+  var media=mediaRisp();
+  var rispMese=media!==null?media:(S.stipendio-S.spese);
+  var pct=Math.min(100,Math.round(S.saldo/target*100));
+  document.getElementById('tsLabel').textContent='Obiettivo: '+fE(target);
+  document.getElementById('tsCur').textContent='Ora: '+fK(S.saldo);
+  document.getElementById('tsTgt').textContent='Target: '+fK(target);
+  setTimeout(function(){document.getElementById('tsFill').style.width=pct+'%';},100);
+  if(rispMese<=0){
+    document.getElementById('tsNote').textContent='Aumenta il risparmio per raggiungere l\'obiettivo';
+    document.getElementById('tsEta').textContent='—';
+    document.getElementById('tsEta').style.color='var(--muted)';
+    return;
+  }
+  var mancano=target-S.saldo;
+  if(mancano<=0){
+    document.getElementById('tsNote').textContent='Obiettivo già raggiunto! 🎉';
+    document.getElementById('tsEta').textContent='✓';
+    document.getElementById('tsEta').style.color='var(--green)';
+    return;
+  }
+  var mesi=Math.ceil(mancano/rispMese);
+  var now=new Date();
+  var arrivo=new Date(now.getFullYear(),now.getMonth()+mesi,1);
+  var etaTxt=MI[arrivo.getMonth()]+' '+arrivo.getFullYear();
+  document.getElementById('tsNote').textContent='Mancano '+fK(mancano)+' · '+mesi+' mes'+(mesi===1?'e':'i');
+  document.getElementById('tsEta').textContent=etaTxt;
+  document.getElementById('tsEta').style.color=mesi<=12?'var(--green)':mesi<=24?'var(--amber)':'var(--red)';
+}
+
+// ── TREND RISPARMIO ────────────────────────────────────────
+function renderTrend(){
+  var tc=document.getElementById('trendCard');
+  var tr=document.getElementById('trendRow');
+  if(!tc||!tr) return;
+  if(S.storico.length<2){
+    document.getElementById('trendChart').innerHTML='';
+    tr.innerHTML='<span style="font-size:12px;color:var(--muted)">Aggiungi almeno 2 mesi nello Storico per vedere il trend</span>';
+    return;
+  }
+  var data=S.storico.map(function(m){return {mi:m.mi,sl:m.stip-m.spese};});
+  var W=340,H=70,px=6,py=6;
+  var vals=data.map(function(d){return d.sl;});
+  var mn=Math.min.apply(null,vals);var mx=Math.max.apply(null,vals);
+  var rng=mx-mn||1;
+  function sx(i){return px+i*(W-px*2)/(data.length-1);}
+  function sy(v){return H-py-((v-mn)/rng)*(H-py*2);}
+  var svg=document.getElementById('trendChart');
+  svg.innerHTML='';
+  // zero line
+  if(mn<0&&mx>0){
+    svg.appendChild(svgEl('line',{x1:0,y1:sy(0).toFixed(1),x2:W,y2:sy(0).toFixed(1),
+      stroke:'var(--border2)','stroke-width':'1','stroke-dasharray':'3 2'}));
+  }
+  // area
+  var defs=svgEl('defs',{});
+  var g=svgEl('linearGradient',{id:'gTrend',x1:'0',y1:'0',x2:'0',y2:'1'});
+  g.appendChild(svgEl('stop',{'offset':'0%','stop-color':'var(--text)','stop-opacity':'.1'}));
+  g.appendChild(svgEl('stop',{'offset':'100%','stop-color':'var(--text)','stop-opacity':'0'}));
+  defs.appendChild(g); svg.appendChild(defs);
+  var pts=data.map(function(d,i){return sx(i).toFixed(1)+','+sy(d.sl).toFixed(1);}).join(' L');
+  svg.appendChild(svgEl('path',{d:'M'+pts+' L'+sx(data.length-1).toFixed(1)+','+H+' L'+sx(0).toFixed(1)+','+H+' Z',fill:'url(#gTrend)'}));
+  // dots
+  data.forEach(function(d,i){
+    var col=d.sl>=0?'var(--green)':'var(--red)';
+    svg.appendChild(svgEl('circle',{cx:sx(i).toFixed(1),cy:sy(d.sl).toFixed(1),r:'4',fill:col,stroke:'var(--surface)','stroke-width':'1.5'}));
+  });
+  // line
+  var lp=svgEl('path',{d:'M'+pts,fill:'none',stroke:'var(--text)','stroke-width':'1.8','stroke-linecap':'round','stroke-linejoin':'round'});
+  var len=W*1.3; lp.style.strokeDasharray=len; lp.style.strokeDashoffset=len;
+  lp.style.transition='stroke-dashoffset .9s cubic-bezier(.22,1,.36,1)';
+  svg.appendChild(lp);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){lp.style.strokeDashoffset='0';});});
+  // trend row
+  // trend: confronta prima metà vs seconda metà dei mesi disponibili
+  var n=data.length;
+  var meta=Math.max(1,Math.floor(n/2));
+  var primaMedia=data.slice(0,meta).reduce(function(a,b){return a+b.sl;},0)/meta;
+  var ultimaMedia=data.slice(-meta).reduce(function(a,b){return a+b.sl;},0)/meta;
+  var tendenza=ultimaMedia-primaMedia;
+  var arrowUp=tendenza>=0;
+  var col=arrowUp?'var(--green)':'var(--red)';
+  var arrow=arrowUp?'▲':'▼';
+  var testo=arrowUp?'In miglioramento':'In peggioramento';
+  tr.innerHTML='<div class="trend-arrow" style="color:'+col+'">'+arrow+'</div>'
+    +'<div class="trend-label" style="color:'+col+'">'+testo+' negli ultimi '+S.storico.length+' mesi</div>'
+    +'<div class="trend-val" style="color:'+col+'">'+(arrowUp?'+':'')+fS(Math.round(tendenza))+'/mese</div>';
+}
+
+// ── RIEPILOGO ANNO ─────────────────────────────────────────
+function renderRiepilogo(){
+  var el=document.getElementById('riepilogoAnno'); if(!el) return;
+  if(S.storico.length<2){el.innerHTML='';return;}
+  var anno=new Date().getFullYear();
+  var meseAnno=S.storico.filter(function(m){return m.anno===anno;});
+  if(!meseAnno.length){el.innerHTML='';return;}
+  var totRisp=meseAnno.reduce(function(a,m){return a+(m.stip-m.spese);},0);
+  var totSpese=meseAnno.reduce(function(a,m){return a+m.spese;},0);
+  var mediaR=totRisp/meseAnno.length;
+  var tassoMedio=meseAnno.reduce(function(a,m){return a+(m.stip>0?(m.stip-m.spese)/m.stip*100:0);},0)/meseAnno.length;
+  var bestM=meseAnno.reduce(function(a,b){return (b.stip-b.spese)>(a.stip-a.spese)?b:a;});
+  var worstM=meseAnno.reduce(function(a,b){return (b.stip-b.spese)<(a.stip-a.spese)?b:a;});
+  el.innerHTML='<div class="stitle">Riepilogo '+anno+'</div>'
+    +'<div class="riepilogo">'
+      +'<div class="rp-title">'+meseAnno.length+' mes'+(meseAnno.length===1?'e':'i')+' registrat'+(meseAnno.length===1?'o':'i')+' su 12</div>'
+      +'<div class="rp-grid">'
+        +'<div class="rp-item"><div class="rp-l">Totale risparmiato</div><div class="rp-v" style="color:'+(totRisp>=0?'var(--green)':'var(--red)')+'">'+fS(totRisp)+'</div><div class="rp-n">da inizio anno</div></div>'
+        +'<div class="rp-item"><div class="rp-l">Media mensile</div><div class="rp-v">'+fS(Math.round(mediaR))+'</div><div class="rp-n">risparmio/mese</div></div>'
+        +'<div class="rp-item"><div class="rp-l">Mese migliore</div><div class="rp-v" style="color:var(--green)">'+MI[bestM.mi]+'</div><div class="rp-n">'+fS(bestM.stip-bestM.spese)+' risparmiati</div></div>'
+        +'<div class="rp-item"><div class="rp-l">Mese peggiore</div><div class="rp-v" style="color:var(--amber)">'+MI[worstM.mi]+'</div><div class="rp-n">'+fS(worstM.stip-worstM.spese)+' risparmiati</div></div>'
+        +'<div class="rp-item"><div class="rp-l">Tasso medio</div><div class="rp-v" style="color:'+(tassoMedio>=20?'var(--green)':tassoMedio>=10?'var(--amber)':'var(--red)')+'">'+Math.round(tassoMedio)+'%</div><div class="rp-n">dello stipendio</div></div>'
+        +'<div class="rp-item"><div class="rp-l">Totale spese</div><div class="rp-v">'+fK(totSpese)+'</div><div class="rp-n">da inizio anno</div></div>'
+      +'</div>'
+    +'</div>';
+}
+
 // ── STORICO ────────────────────────────────────────────────
 function addMese(){
   var mi=parseInt(document.getElementById('stM').value);
@@ -833,14 +1061,21 @@ function addMese(){
   var stip=parseFloat(document.getElementById('stSt').value)||0;
   var spese=parseFloat(document.getElementById('stSp').value)||0;
   var saldo=parseFloat(document.getElementById('stSa').value)||0;
+  var nota=(document.getElementById('stNota').value||'').trim();
   if(!stip){toast('Inserisci lo stipendio');return;}
+  if(!spese){toast('Inserisci anche le spese');return;}
+  // se esiste già un mese con stesso mi+anno, chiedi conferma
+  var exists=S.storico.find(function(m){return m.mi===mi&&m.anno===anno;});
+  if(exists){
+    if(!confirm('Esiste già '+MIF[mi]+' '+anno+'. Sovrascriverlo?'))return;
+  }
   S.storico=S.storico.filter(function(m){return !(m.mi===mi&&m.anno===anno);});
-  S.storico.push({mi:mi,anno:anno,stip:stip,spese:spese,saldo:saldo});
+  S.storico.push({mi:mi,anno:anno,stip:stip,spese:spese,saldo:saldo,nota:nota});
   S.storico.sort(function(a,b){return a.anno!==b.anno?a.anno-b.anno:a.mi-b.mi;});
   sv();
-  ['stSt','stSp','stSa'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  ['stSt','stSp','stSa','stNota'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   renderStorico();
-  toast('Mese salvato');
+  toast(exists?'Mese aggiornato':'Mese salvato');
 }
 function rmMese(idx){
   if(!confirm('Eliminare questo mese?'))return;
@@ -850,6 +1085,7 @@ function editMese(idx){
   var m=S.storico[idx]; if(!m) return;
   var ids={stM:m.mi,stA:m.anno,stSt:m.stip,stSp:m.spese,stSa:m.saldo};
   for(var id in ids){var e=document.getElementById(id);if(e)e.value=ids[id];}
+  var en=document.getElementById('stNota'); if(en) en.value=m.nota||'';
   var f=document.getElementById('stSt');
   if(f)f.scrollIntoView({behavior:'smooth',block:'center'});
   toast('Modifica i valori e premi Salva mese');
@@ -857,7 +1093,8 @@ function editMese(idx){
 function renderStorico(){
   var el=document.getElementById('storicoList'); if(!el) return;
   if(!S.storico.length){
-    el.innerHTML='<div class="empty">Nessun mese registrato.<br>Aggiungi i mesi passati qui sotto.</div>';return;
+    el.innerHTML='<div class="empty">Nessun mese registrato.<br>Aggiungi i mesi passati qui sotto.</div>';
+    renderRiepilogo(); return;
   }
   var media=mediaRisp();
   var maxS=Math.max.apply(null,S.storico.map(function(m){return Math.abs(m.stip-m.spese);}));
@@ -870,9 +1107,10 @@ function renderStorico(){
     var bw=Math.min(100,Math.abs(saved)/maxS*100);
     var bc=saved>=0?'var(--green)':'var(--red)';
     var badge=isAnom?(saved<media?
-      '<span class="mr-badge" style="background:var(--rbg);color:var(--red)">alto</span>':
-      '<span class="mr-badge" style="background:var(--gbg);color:var(--green)">basso</span>'):'';
-    html+='<div class="mrow">'
+      '<span class="mr-badge" style="background:var(--rbg);color:var(--red)">spese alte</span>':
+      '<span class="mr-badge" style="background:var(--gbg);color:var(--green)">spese basse</span>'):'';
+    var notaHtml=m.nota?'<div class="note-display">💬 '+m.nota+'</div>':'';
+    html+='<div class="mrow" style="flex-wrap:wrap">'
       +'<div class="mr-m">'+MI[m.mi]+'</div>'
       +'<div class="mr-bw"><div class="mr-b" id="mb'+i+'" style="width:0%;background:'+bc+'"></div></div>'
       +'<div class="mr-v" style="color:'+bc+'">'+fS(saved)+'</div>'
@@ -881,7 +1119,9 @@ function renderStorico(){
       +'<div class="mr-actions">'
         +'<button class="mr-btn edit" onclick="editMese('+i+')" title="Modifica">✎</button>'
         +'<button class="mr-btn" onclick="rmMese('+i+')" title="Elimina">✕</button>'
-      +'</div></div>';
+      +'</div>'
+      +(notaHtml?'<div style="width:100%;padding:4px 0 2px">'+notaHtml+'</div>':'')
+      +'</div>';
   });
   if(S.storico.length>1){
     html+='<div style="display:flex;justify-content:space-between;padding:9px 0 2px;'
@@ -895,6 +1135,7 @@ function renderStorico(){
     var bw=Math.min(100,Math.abs(saved)/maxS*100);
     setTimeout((function(idx,w){return function(){var b=document.getElementById('mb'+idx);if(b)b.style.width=w+'%';};})(i,bw),i*50+80);
   });
+  renderRiepilogo();
 }
 
 // ── PIANIFICA ──────────────────────────────────────────────
@@ -948,6 +1189,8 @@ function renderPiano(){
         +'</div>'
       +'</div>'
       +'<div class="pm-bar"><div class="pm-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'
+      +(d.sl<S.soglia&&d.sl>=0?'<div class="soglia-alert" style="background:var(--abg);color:var(--amber)">⚠️ Questo mese il saldo scende sotto la soglia minima di '+fE(S.soglia)+'</div>':'')
+      +(d.sl<0?'<div class="soglia-alert" style="background:var(--rbg);color:var(--red)">🚨 Saldo in rosso — rivedi le spese di questo mese</div>':'')
       +(evHtml?'<div class="pm-events">'+evHtml+'</div>':'')
       +'<button class="pm-add-btn" onclick="openEvForm('+d.mi+','+d.anno+')">+ Aggiungi evento</button>';
 
@@ -1090,7 +1333,7 @@ function renderGoals(){
 
 // ── SETUP ──────────────────────────────────────────────────
 function renderSetup(){
-  var m={sSt:'stipendio',sSp:'spese',sSa:'saldo',sSog:'soglia'};
+  var m={sSt:'stipendio',sSp:'spese',sSa:'saldo',sSog:'soglia',sTarget:'targetSaldo'};
   for(var id in m){var e=document.getElementById(id);if(e)e.value=S[m[id]]||'';}
   renderFxList();
 }
@@ -1119,6 +1362,7 @@ function doSave(){
   S.spese=parseFloat(document.getElementById('sSp').value)||0;
   S.saldo=parseFloat(document.getElementById('sSa').value)||0;
   S.soglia=parseFloat(document.getElementById('sSog').value)||2000;
+  S.targetSaldo=parseFloat(document.getElementById('sTarget').value)||0;
   sv();
   try{localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));}catch(e){}
   toast('Salvato');
@@ -1126,7 +1370,7 @@ function doSave(){
 }
 function doReset(){
   if(!confirm('Cancellare tutti i dati?'))return;
-  S={stipendio:0,spese:0,saldo:0,soglia:2000,fixed:[],storico:[],goals:[],piano:[]};
+  S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,fixed:[],storico:[],goals:[],piano:[]};
   sv();try{localStorage.removeItem(LK+'_upd');}catch(e){}
   renderSetup(); toast('Reset effettuato');
 }
@@ -1143,7 +1387,7 @@ function toast(msg){
 // DEMO
 function loadDemo(){
   if(!S.stipendio&&!S.saldo){
-    S.stipendio=2000;S.spese=1600;S.saldo=8200;S.soglia=3000;
+    S.stipendio=2000;S.spese=1600;S.saldo=8200;S.soglia=3000;S.targetSaldo=15000;
     S.fixed=[{id:1,name:'Affitto',amt:700},{id:2,name:'Auto',amt:220},{id:3,name:'Abbonamenti',amt:35}];
     S.storico=[
       {mi:0,anno:2026,stip:2000,spese:1580,saldo:7800},

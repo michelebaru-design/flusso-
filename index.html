@@ -243,8 +243,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .bg-track{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;
   margin-bottom:5px;position:relative}
 .bg-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.22,1,.36,1)}
-.bg-marker{position:absolute;top:-4px;width:2px;height:16px;background:var(--text);
-  border-radius:1px;z-index:2}
 .bg-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
 
 /* DUAL CHART (entrate vs uscite) */
@@ -291,11 +289,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   cursor:pointer;margin-top:7px}
 .sub-btn{padding:8px 14px;border-radius:10px;border:.5px solid var(--border2);
   background:var(--s2);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer}
-.fx-row{display:flex;align-items:center;justify-content:space-between;
-  padding:9px 0;border-bottom:.5px solid var(--border)}
-.fx-row:last-child{border-bottom:none}
-.fx-name{font-size:13px;font-weight:500}
-.fx-amt{font-size:13px;font-weight:600;color:var(--red)}
 .fx-del{background:none;border:none;color:var(--faint);font-size:15px;cursor:pointer;padding:0 4px}
 .divider{height:.5px;background:var(--border);margin:13px 0}
 
@@ -375,7 +368,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div id="reminderBanner"></div>
   <div id="anomalyBanner"></div>
 
-  <!-- BUDGET CONSUMATO -->
+  <!-- BUDGET DEL MESE -->
   <div class="budget-card" id="budgetCard" style="display:none">
     <div class="bg-head">
       <div>
@@ -386,11 +379,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
     <div class="bg-track">
       <div class="bg-fill" id="bgFill" style="width:0%"></div>
-      <div class="bg-marker" id="bgMarker" style="left:50%"></div>
     </div>
     <div class="bg-foot">
       <span id="bgPrevSpese">—</span>
-      <span id="bgPrevPctTime">—</span>
     </div>
   </div>
 
@@ -658,7 +649,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="fc">
     <div class="frow">
       <div class="field"><label>Stipendio netto €</label><input type="number" id="sSt" placeholder="2000" inputmode="decimal"></div>
-      <div class="field"><label>Spese previste €/mese</label><input type="number" id="sSp" placeholder="1600" inputmode="decimal"></div>
+      <div class="field"><label>Spese totali previste €/mese</label><input type="number" id="sSp" placeholder="1600" inputmode="decimal"></div>
     </div>
     <div class="frow full">
       <div class="field"><label>Saldo bancario oggi €</label><input type="number" id="sSa" placeholder="8000" inputmode="decimal"></div>
@@ -687,16 +678,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px">
       L'app calcolerà in che mese raggiungi questo saldo basandosi sulla tua media storica reale.
     </div>
-  </div>
-
-  <div class="stitle">Costi fissi mensili</div>
-  <div class="fc">
-    <div id="fxList" style="margin-bottom:4px"></div>
-    <div class="frow">
-      <div class="field"><label>Nome</label><input type="text" id="fxN" placeholder="Affitto" maxlength="20"></div>
-      <div class="field"><label>Importo €</label><input type="number" id="fxA" placeholder="800" inputmode="decimal"></div>
-    </div>
-    <button class="pri-btn" onclick="addFx()" style="background:var(--s2);color:var(--text);border:.5px solid var(--border2)">+ Aggiungi costo fisso</button>
   </div>
 
   <button class="pri-btn" onclick="doSave()" style="margin-bottom:9px">Salva e aggiorna</button>
@@ -739,18 +720,16 @@ var TABS=['home','storico','pianifica','simula','goals','setup'];
 
 var S={
   stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
-  fixed:[],storico:[],goals:[],
-  piano:[]
+  storico:[],goals:[],piano:[]
 };
 
 function sv(){try{localStorage.setItem(LK,JSON.stringify(S));}catch(e){}}
 function ld(){try{var d=localStorage.getItem(LK);if(d)Object.assign(S,JSON.parse(d));}catch(e){}}
 
-function fE(v){return '\u20ac'+Math.round(Math.abs(v)).toLocaleString('it-IT');}
-function fS(v){return (v<0?'-':'')+fE(v);}
-function fK(v){var a=Math.abs(v);return (v<0?'-':'')+'\u20ac'+(a>=1000?(a/1000).toFixed(1)+'k':Math.round(a));}
+function fE(v){if(!isFinite(v)||isNaN(v))return '\u20ac—';return '\u20ac'+Math.round(Math.abs(v)).toLocaleString('it-IT');}
+function fS(v){if(!isFinite(v)||isNaN(v))return '—';return (v<0?'-':'')+fE(v);}
+function fK(v){if(!isFinite(v)||isNaN(v))return '—';var a=Math.abs(v);return (v<0?'-':'')+'\u20ac'+(a>=1000?(a/1000).toFixed(1)+'k':Math.round(a));}
 function fPct(v){return Math.round(v)+'%';}
-function tfx(){return S.fixed.reduce(function(a,f){return a+(parseFloat(f.amt)||0);},0);}
 function mediaRisp(){
   if(!S.storico.length) return null;
   return S.storico.reduce(function(a,m){return a+(m.stip-m.spese);},0)/S.storico.length;
@@ -997,51 +976,31 @@ function renderBudget(){
   var card=document.getElementById('budgetCard'); if(!card) return;
   if(!S.spese||S.spese<=0||!S.stipendio){card.style.display='none';return;}
   card.style.display='block';
-
-  // Calcola la media storica delle spese (solo storico, non mese corrente)
   var mediaSpese=null;
   if(S.storico.length>0){
     mediaSpese=S.storico.reduce(function(a,m){return a+m.spese;},0)/S.storico.length;
   }
-
-  var now=new Date();
-  var giornoOggi=now.getDate();
-  var giorniMese=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  var pctTempo=Math.round(giornoOggi/giorniMese*100);
-
-  // budget vs stipendio (quanto del tuo stipendio stai pianificando di spendere)
   var pctBudget=Math.round(S.spese/S.stipendio*100);
   document.getElementById('bgPct').textContent=pctBudget+'%';
-  document.getElementById('bgSub').textContent='Budget '+fE(S.spese)+' di '+fE(S.stipendio)+' stipendio';
-
-  // confronto con media storica
-  var msg;
-  if(mediaSpese!==null){
-    var diff=S.spese-mediaSpese;
-    if(Math.abs(diff)<mediaSpese*0.05){
-      msg='In linea con la tua media';
-    } else if(diff>0){
-      msg='Budget '+fK(Math.abs(diff))+' sopra la media';
-    } else {
-      msg='Budget '+fK(Math.abs(diff))+' sotto la media';
-    }
-    document.getElementById('bgPrevSpese').textContent=msg;
-  } else {
-    document.getElementById('bgPrevSpese').textContent='Aggiungi storico per confronti';
-  }
-  document.getElementById('bgPrevPctTime').textContent='Giorno '+giornoOggi+' di '+giorniMese;
-
-  // colore: % budget vs stipendio
-  // <60% verde (sano), 60-75% arancione (ok), >75% rosso (alto)
+  document.getElementById('bgSub').textContent='Spese '+fE(S.spese)+' su stipendio '+fE(S.stipendio);
   var fillCol,pctCol;
   if(pctBudget>=75){fillCol='var(--red)';pctCol='var(--red)';}
   else if(pctBudget>=60){fillCol='var(--amber)';pctCol='var(--amber)';}
   else{fillCol='var(--green)';pctCol='var(--green)';}
   document.getElementById('bgPct').style.color=pctCol;
+  var msg;
+  if(mediaSpese!==null){
+    var diff=S.spese-mediaSpese;
+    if(Math.abs(diff)<mediaSpese*0.05) msg='In linea con la tua media storica';
+    else if(diff>0) msg='Budget '+fK(diff)+' sopra la media storica';
+    else msg='Budget '+fK(Math.abs(diff))+' sotto la media storica';
+  } else {
+    msg='Aggiungi storico per confronti con la media';
+  }
+  document.getElementById('bgPrevSpese').textContent=msg;
   setTimeout(function(){
     document.getElementById('bgFill').style.width=Math.min(100,pctBudget)+'%';
     document.getElementById('bgFill').style.background=fillCol;
-    document.getElementById('bgMarker').style.left=pctTempo+'%';
   },100);
 }
 
@@ -1288,6 +1247,7 @@ function addMese(){
   var saldo=parseFloat(document.getElementById('stSa').value)||0;
   var nota=(document.getElementById('stNota').value||'').trim();
   if(!stip){toast('Inserisci lo stipendio');return;}
+  if(!spese){toast('Inserisci le spese effettive');return;}
   if(!spese){toast('Inserisci anche le spese');return;}
   // se esiste già un mese con stesso mi+anno, chiedi conferma
   var exists=S.storico.find(function(m){return m.mi===mi&&m.anno===anno;});
@@ -1628,29 +1588,8 @@ function renderGoals(){
 function renderSetup(){
   var m={sSt:'stipendio',sSp:'spese',sSa:'saldo',sSog:'soglia',sTarget:'targetSaldo'};
   for(var id in m){var e=document.getElementById(id);if(e)e.value=S[m[id]]||'';}
-  renderFxList();
   updateBackupLabel();
 }
-function renderFxList(){
-  var el=document.getElementById('fxList'); if(!el) return;
-  if(!S.fixed.length){el.innerHTML='';return;}
-  el.innerHTML=S.fixed.map(function(f){
-    return '<div class="fx-row"><div><div class="fx-name">'+f.name+'</div></div>'
-      +'<div style="display:flex;align-items:center;gap:7px">'
-        +'<div class="fx-amt">-'+fE(f.amt)+'</div>'
-        +'<button class="fx-del" onclick="rmFx('+f.id+')">✕</button>'
-      +'</div></div>';
-  }).join('');
-}
-function addFx(){
-  var n=(document.getElementById('fxN').value||'').trim();
-  var a=parseFloat(document.getElementById('fxA').value)||0;
-  if(!n||!a){toast('Inserisci nome e importo');return;}
-  S.fixed.push({id:Date.now(),name:n,amt:a});sv();
-  document.getElementById('fxN').value='';document.getElementById('fxA').value='';
-  renderFxList(); toast('Aggiunto');
-}
-function rmFx(id){S.fixed=S.fixed.filter(function(f){return f.id!==id;});sv();renderFxList();}
 function doSave(){
   S.stipendio=parseFloat(document.getElementById('sSt').value)||0;
   S.spese=parseFloat(document.getElementById('sSp').value)||0;
@@ -1694,7 +1633,7 @@ function importBackup(ev){
       }
       showConfirm('Ripristinare il backup?','I dati attuali verranno sovrascritti.',function(){
         Object.assign(S,{stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
-          fixed:[],storico:[],goals:[],piano:[]},obj.state);
+          storico:[],goals:[],piano:[]},obj.state);
         sv();
         renderSetup();
         toast('Backup ripristinato');
@@ -1716,7 +1655,7 @@ function updateBackupLabel(){
 
 function doReset(){
   showConfirm('Reset tutti i dati','Questa azione è irreversibile. Tutto verrà cancellato.',function(){
-    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,fixed:[],storico:[],goals:[],piano:[]};
+    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,storico:[],goals:[],piano:[]};
     sv();try{localStorage.removeItem(LK+'_upd');}catch(e){}
     renderSetup(); toast('Reset effettuato');
   });
@@ -1759,7 +1698,6 @@ function toast(msg){
 function loadDemo(){
   if(!S.stipendio&&!S.saldo){
     S.stipendio=2000;S.spese=1600;S.saldo=8200;S.soglia=3000;S.targetSaldo=15000;
-    S.fixed=[{id:1,name:'Affitto',amt:700},{id:2,name:'Auto',amt:220},{id:3,name:'Abbonamenti',amt:35}];
     S.storico=[
       {mi:0,anno:2026,stip:2000,spese:1580,saldo:7800},
       {mi:1,anno:2026,stip:2000,spese:1720,saldo:8080},

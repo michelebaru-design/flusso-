@@ -432,7 +432,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="kpi-n" id="kNettoN">—</div>
     </div>
     <div class="kpi">
-      <div class="kpi-l">Del tuo stipendio</div>
+      <div class="kpi-l">Tasso di risparmio</div>
       <div class="kpi-v" id="kTasso">—</div>
       <div class="kpi-n" id="kTassoN">—</div>
     </div>
@@ -1040,7 +1040,11 @@ function renderHome(){
   kt.style.color=S.stipendio===0?'var(--muted)':tasso>=20?'var(--green)':tasso>=10?'var(--amber)':'var(--red)';
   var ktN=document.getElementById('kTassoN');
   if(S.stipendio>0){
-    var taText=tasso>=20?'ottimo, sei sopra il 20%':tasso>=10?'nella norma':tasso>0?'troppo basso':'tutto speso';
+    var taText;
+    if(tasso>=20)      taText='1 euro ogni 5 va in risparmio';
+    else if(tasso>=10) taText='nella norma, punta al 20%';
+    else if(tasso>0)   taText='troppo basso — riduci le spese';
+    else               taText='nessun risparmio questo mese';
     ktN.innerHTML=taText+badgeS;
   } else { ktN.innerHTML='dello stipendio'; }
 

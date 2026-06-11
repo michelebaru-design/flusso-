@@ -355,6 +355,48 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 /* KPI interpretivo — sottotitolo più lungo */
 .kpi-n{font-size:11px;color:var(--muted);line-height:1.35}
 
+/* HERO 3 NUMERI */
+.hero3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:12px 0 16px;
+  border-bottom:.5px solid var(--border);margin-bottom:12px}
+.h3-item{display:flex;flex-direction:column;gap:3px;padding:0 4px}
+.h3-item:first-child{padding-left:0}
+.h3-item:last-child{padding-right:0;text-align:right}
+.h3-item:nth-child(2){text-align:center;border-left:.5px solid var(--border);
+  border-right:.5px solid var(--border)}
+.h3-label{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.4px}
+.h3-val{font-size:22px;font-weight:700;letter-spacing:-.8px;line-height:1}
+.h3-note{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* PIANO TABLE ROW */
+.piano-row{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
+  padding:12px 13px;margin-bottom:8px;position:relative}
+.piano-row.current{border-left:3px solid var(--blue)}
+.piano-row.ok{border-left:3px solid var(--green)}
+.piano-row.warn{border-left:3px solid var(--amber)}
+.piano-row.danger{border-left:3px solid var(--red)}
+.pr-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.pr-month{font-size:15px;font-weight:600;letter-spacing:-.2px}
+.pr-tag{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  padding:2px 7px;border-radius:5px}
+.pr-tag.current{background:var(--bbg);color:var(--blue)}
+.pr-tag.ok{background:var(--gbg);color:var(--green)}
+.pr-tag.warn{background:var(--abg);color:var(--amber)}
+.pr-tag.danger{background:var(--rbg);color:var(--red)}
+.pr-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.pr-cell{display:flex;flex-direction:column;gap:1px}
+.pr-cell-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.4px}
+.pr-cell-val{font-size:13px;font-weight:600;letter-spacing:-.3px}
+.pr-events{margin-top:8px;display:flex;flex-direction:column;gap:3px}
+.pr-event{display:flex;align-items:center;justify-content:space-between;
+  padding:4px 8px;border-radius:7px;background:var(--s2)}
+.pr-event-name{font-size:11px;font-weight:500}
+.pr-event-amt{font-size:11px;font-weight:600}
+.pr-add{width:100%;background:none;border:.5px dashed var(--border2);border-radius:8px;
+  padding:6px;font-size:11px;color:var(--muted);cursor:pointer;margin-top:6px;text-align:center}
+.pr-soglia-alert{margin-top:6px;padding:6px 8px;border-radius:8px;font-size:11px;font-weight:500}
+
 /* HERO sub ora più visibile */
 .hero-sub{font-size:13px;color:var(--muted);letter-spacing:-.1px}
 .hero-sub.highlight{color:var(--green);font-weight:500}
@@ -391,10 +433,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 <!-- ═══ OGGI ════════════════════════════════════════════════ -->
 <div class="screen on" id="s-oggi">
-  <div class="hero">
-    <div class="hero-label">Saldo bancario oggi</div>
-    <div class="hero-num" id="hSaldo">—</div>
-    <div class="hero-sub" id="hSub">Configura i dati in Setup</div>
+
+  <!-- 3 NUMERI CHIAVE -->
+  <div class="hero3">
+    <div class="h3-item">
+      <div class="h3-label">Oggi</div>
+      <div class="h3-val" id="h3Oggi">—</div>
+      <div class="h3-note">saldo reale</div>
+    </div>
+    <div class="h3-item">
+      <div class="h3-label">Fine mese</div>
+      <div class="h3-val" id="h3FineMese">—</div>
+      <div class="h3-note" id="h3FineNote">previsto</div>
+    </div>
+    <div class="h3-item">
+      <div class="h3-label">12 mesi</div>
+      <div class="h3-val" id="h3Dodici">—</div>
+      <div class="h3-note" id="h3DodiciBadge">proiezione</div>
+    </div>
   </div>
 
   <div class="status" id="statusBar">
@@ -684,14 +740,50 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 <!-- ═══ IMPOSTAZIONI ══════════════════════════════════════════════ -->
 <div class="screen" id="s-impostazioni">
-  <div class="stitle" style="margin-top:4px">Questo mese</div>
+  <div class="stitle" style="margin-top:4px">Mese corrente</div>
+  <div class="fc">
+    <div class="frow full">
+      <div class="field"><label>Saldo bancario oggi €</label>
+        <input type="number" id="sSa" placeholder="6700" inputmode="decimal"
+          oninput="aggiornaSaldoFineMese()">
+      </div>
+    </div>
+    <div class="frow">
+      <div class="field"><label>Entrate ancora attese €</label>
+        <input type="number" id="sEntrateAttese" placeholder="0" inputmode="decimal"
+          oninput="aggiornaSaldoFineMese()">
+      </div>
+      <div class="field"><label>Spese ancora previste €</label>
+        <input type="number" id="sSpeseAttese" placeholder="800" inputmode="decimal"
+          oninput="aggiornaSaldoFineMese()">
+      </div>
+    </div>
+    <div style="background:var(--s2);border-radius:10px;padding:11px 13px;
+      display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;font-weight:500;color:var(--muted)">Saldo previsto fine mese</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:1px">calcolato automaticamente</div>
+      </div>
+      <div id="saldoFineMeseCalc" style="font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--green)">—</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px">
+      <strong>Entrate ancora attese</strong>: stipendio non ancora arrivato, rimborsi, ecc.<br>
+      <strong>Spese ancora previste</strong>: quello che devi ancora spendere da oggi a fine mese.
+    </div>
+  </div>
+
+  <div class="stitle">Mesi futuri</div>
   <div class="fc">
     <div class="frow">
-      <div class="field"><label>Stipendio netto €</label><input type="number" id="sSt" placeholder="2000" inputmode="decimal"></div>
-      <div class="field"><label>Spese totali previste €/mese</label><input type="number" id="sSp" placeholder="1600" inputmode="decimal"></div>
+      <div class="field"><label>Stipendio mensile netto €</label>
+        <input type="number" id="sSt" placeholder="2000" inputmode="decimal">
+      </div>
+      <div class="field"><label>Spese mensili previste €</label>
+        <input type="number" id="sSp" placeholder="1600" inputmode="decimal">
+      </div>
     </div>
-    <div class="frow full">
-      <div class="field"><label>Saldo bancario oggi €</label><input type="number" id="sSa" placeholder="8000" inputmode="decimal"></div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px">
+      Questi valori vengono usati per proiettare i mesi futuri.
     </div>
   </div>
 
@@ -713,9 +805,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="field"><label>Voglio arrivare a €</label>
         <input type="number" id="sTarget" placeholder="15000" inputmode="decimal">
       </div>
-    </div>
-    <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px">
-      L'app calcolerà in che mese raggiungi questo saldo basandosi sulla tua media storica reale.
     </div>
   </div>
 
@@ -758,8 +847,9 @@ var LK='flusso2_v2';
 var TABS=['oggi','piano','obiettivi','impostazioni'];
 
 var S={
-  stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
-  storico:[],goals:[],piano:[]
+  stipendio:0, spese:0, saldo:0, soglia:2000, targetSaldo:0,
+  entrateAttese:0, speseAttese:0,
+  storico:[], goals:[], piano:[]
 };
 
 function sv(){try{localStorage.setItem(LK,JSON.stringify(S));}catch(e){}}
@@ -774,42 +864,69 @@ function mediaRisp(){
   return S.storico.reduce(function(a,m){return a+(m.stip-m.spese);},0)/S.storico.length;
 }
 
-// ── PROJECT BASE (linear) ──────────────────────────────────
-function projectBase(saldo, rispMese){
+// Saldo previsto a fine mese corrente
+function calcSaldoFineMese(){
+  return S.saldo+(S.entrateAttese||0)-(S.speseAttese||0);
+}
+
+// Proiezione lineare (usata da Simula)
+function projectBase(saldoStart, rispMese){
   var now=new Date(), res=[];
   for(var m=0;m<12;m++){
-    saldo+=rispMese;
-    res.push({mi:(now.getMonth()+m)%12, sl:Math.round(saldo)});
+    saldoStart+=rispMese;
+    res.push({mi:(now.getMonth()+m)%12, sl:Math.round(saldoStart)});
   }
   return res;
 }
 
-// ── PROJECT PIANO (with events) ────────────────────────────
+// Proiezione corretta: mese corrente = parziale, futuri partono da saldo fine mese
 function projectPiano(opts){
   opts=opts||{};
   var now=new Date();
   var media=mediaRisp();
   var rispBase=opts.risp!==undefined?opts.risp:(media!==null?media:(S.stipendio-S.spese));
-  var saldo=opts.saldo!==undefined?opts.saldo:S.saldo;
-  var res=[];
-  for(var m=0;m<12;m++){
+  var saldoOggi=opts.saldo!==undefined?opts.saldo:S.saldo;
+  var saldoFine=opts.saldoFine!==undefined?opts.saldoFine:calcSaldoFineMese();
+  var entrateM0=S.entrateAttese||0;
+  var usciteM0=S.speseAttese||0;
+
+  // Mese corrente (parziale, aperto)
+  var res=[{
+    mi:now.getMonth(), anno:now.getFullYear(),
+    saldoInizio:Math.round(saldoOggi),
+    entrate:Math.round(entrateM0), uscite:Math.round(usciteM0),
+    sl:Math.round(saldoFine),
+    eventi:[], isCurrent:true
+  }];
+
+  // Mesi futuri: partono dal saldo fine mese corrente
+  var saldo=saldoFine-(opts.ot||0);
+  for(var m=1;m<12;m++){
     var mi=(now.getMonth()+m)%12;
     var anno=now.getFullYear()+Math.floor((now.getMonth()+m)/12);
-    // trova piano di questo mese
-    var piano=null;
+    var pianoM=null;
     for(var i=0;i<S.piano.length;i++){
-      if(S.piano[i].mi===mi&&S.piano[i].anno===anno){piano=S.piano[i];break;}
+      if(S.piano[i].mi===mi&&S.piano[i].anno===anno){pianoM=S.piano[i];break;}
     }
-    var evIn=0,evOut=0;
-    if(piano&&piano.eventi){
-      piano.eventi.forEach(function(ev){
+    var evIn=0,evOut=0,eventi=[];
+    if(pianoM&&pianoM.eventi){
+      pianoM.eventi.forEach(function(ev){
         if(ev.tipo==='in') evIn+=parseFloat(ev.amt)||0;
         else evOut+=parseFloat(ev.amt)||0;
+        eventi.push(ev);
       });
     }
-    saldo+=rispBase+evIn-evOut;
-    res.push({mi:mi,anno:anno,sl:Math.round(saldo),evIn:evIn,evOut:evOut,
-      eventi:piano?piano.eventi:[]});
+    var entrateMese=S.stipendio+evIn;
+    var usciteMese=S.spese+evOut+(opts.addRecurr||0);
+    var saldoInizio=saldo;
+    saldo+=rispBase+evIn-evOut-(opts.addRecurr||0);
+    res.push({
+      mi:mi, anno:anno,
+      saldoInizio:Math.round(saldoInizio),
+      entrate:Math.round(entrateMese), uscite:Math.round(usciteMese),
+      sl:Math.round(saldo),
+      eventi:eventi, isCurrent:false
+    });
   }
   return res;
 }
@@ -999,27 +1116,41 @@ function renderHome(){
   var media=mediaRisp();
   var rispMese=media!==null?media:(S.stipendio-S.spese);
   var netto=S.stipendio-S.spese;
-  var proj=projectBase(S.saldo, rispMese);
   var disponibile=S.saldo-S.soglia;
   var tasso=S.stipendio>0?Math.round(netto/S.stipendio*100):0;
   var isReal=S.storico.length>0; // abbiamo dati storici reali
 
-  // ── HERO: linguaggio interpretivo ──
-  var hEl=document.getElementById('hSaldo');
-  hEl.textContent=S.saldo>0?fK(S.saldo):'—';
-  hEl.style.color=S.saldo>0?(disponibile>=0?'var(--text)':'var(--red)'):'var(--muted)';
-  var hSub=document.getElementById('hSub');
+  // ── 3 NUMERI HERO ──
+  var saldoFine=calcSaldoFineMese();
+  var proj12=projectPiano();
+  var saldo12=proj12[11].sl;
+
+  var h3o=document.getElementById('h3Oggi');
+  var h3f=document.getElementById('h3FineMese');
+  var h3d=document.getElementById('h3Dodici');
+  var h3fn=document.getElementById('h3FineNote');
+  var h3db=document.getElementById('h3DodiciBadge');
+
+  if(h3o) {h3o.textContent=S.saldo>0?fK(S.saldo):'—'; h3o.style.color='var(--text)';}
+  if(h3f){
+    h3f.textContent=S.stipendio>0?fK(saldoFine):'—';
+    h3f.style.color=saldoFine>=S.soglia?'var(--green)':saldoFine>=0?'var(--amber)':'var(--red)';
+  }
+  if(h3fn) h3fn.textContent=S.stipendio>0?'previsto fine '+MI[new Date().getMonth()]:'—';
+  if(h3d){
+    h3d.textContent=S.stipendio>0?fK(saldo12):'—';
+    h3d.style.color=saldo12>=0?'var(--text)':'var(--red)';
+  }
+  if(h3db) h3db.innerHTML=S.storico.length>0?
+    '<span class="badge-dato badge-reale">● reale</span>':
+    '<span class="badge-dato badge-stima">○ stima</span>';
+
+  // ── SOGLIA ─ testo interpretivo ──
   if(S.stipendio>0){
-    if(disponibile>=0){
-      hSub.textContent='Hai '+fE(disponibile)+' di margine disponibile';
-      hSub.className='hero-sub highlight';
-    } else {
-      hSub.textContent='Sei '+fE(Math.abs(disponibile))+' sotto la soglia minima';
-      hSub.className='hero-sub danger';
-    }
-  } else {
-    hSub.textContent='Configura i dati in Impostazioni';
-    hSub.className='hero-sub';
+    var sogliaNote=document.getElementById('sogliaNote');
+    if(sogliaNote) sogliaNote.textContent=disponibile>=0?
+      'Soglia minima \u20ac'+Math.round(S.soglia).toLocaleString('it-IT')+' — puoi spendere fino a \u20ac'+Math.round(disponibile).toLocaleString('it-IT')+' extra':
+      'Sei \u20ac'+Math.round(Math.abs(disponibile)).toLocaleString('it-IT')+' sotto la soglia minima';
   }
 
   // ── KPI: linguaggio interpretivo + badge reale/stimato ──
@@ -1057,15 +1188,15 @@ function renderHome(){
   } else { kmN.innerHTML='aggiungi storico'+badgeS; }
 
   var kp=document.getElementById('kProj');
-  kp.textContent=S.stipendio>0?fK(proj[11].sl):'—';
-  kp.style.color=proj[11].sl>=0?'var(--text)':'var(--red)';
+  kp.textContent=S.stipendio>0?fK(saldo12):'—';
+  kp.style.color=saldo12>=0?'var(--text)':'var(--red)';
   var kpN=document.getElementById('kProjN');
   if(S.stipendio>0){
-    kpN.innerHTML=(proj[11].sl>=0?'in banca tra 12 mesi':'in rosso tra 12 mesi')+(isReal?badgeR:badgeS);
+    kpN.innerHTML=(saldo12>=0?'in banca tra 12 mesi':'in rosso tra 12 mesi')+(isReal?badgeR:badgeS);
   } else { kpN.innerHTML='—'; }
 
   document.getElementById('projNote').textContent=
-    media!==null?'basata su '+S.storico.length+' mesi reali':'stima · aggiungi storico';
+    media!==null?'da media storica '+S.storico.length+' mesi':'stima · aggiungi storico';
 
   // ── SOGLIA ──
   var maxB=Math.max(S.saldo,S.soglia*1.5,1);
@@ -1095,8 +1226,8 @@ function renderHome(){
   var svgHC=document.getElementById('homeChart');
   if(svgHC) svgHC.innerHTML='';
   if(S.stipendio>0){
-    if(svgHC) drawLine('homeChart',proj,340,88,null,false,'hc');
-    setML('homeML',proj);
+    if(svgHC) drawLine('homeChart',proj12,340,88,null,false,'hc');
+    setML('homeML',proj12);
   } else {
     var mlHC=document.getElementById('homeML'); if(mlHC) mlHC.innerHTML='';
   }
@@ -1600,52 +1731,61 @@ function renderPiano(){
     }
   }
 
-  var maxAbs=Math.max.apply(null,data.map(function(d){return Math.abs(d.sl);}));
-  maxAbs=maxAbs||1;
-
   var container=document.getElementById('pianoList');
   container.innerHTML='';
 
   data.forEach(function(d){
-    var pct=Math.min(100,Math.max(0,d.sl/maxAbs*100));
     var col=d.sl<0?'var(--red)':d.sl<S.soglia?'var(--amber)':'var(--green)';
-    var dotCol=d.sl<0?'var(--red)':d.sl<S.soglia?'var(--amber)':'var(--green)';
-
-    var card=document.createElement('div');
-    card.className='piano-month';
+    var rowCls=d.isCurrent?'current':d.sl<0?'danger':d.sl<S.soglia?'warn':'ok';
+    var tagTxt=d.isCurrent?'In corso':d.sl<0?'In rosso':d.sl<S.soglia?'Sotto soglia':'OK';
 
     var evHtml='';
     if(d.eventi&&d.eventi.length){
       d.eventi.forEach(function(ev,ei){
         var isOut=ev.tipo==='out';
-        evHtml+='<div class="pm-event">'
-          +'<span class="pm-event-name">'+(isOut?'▼ ':'▲ ')+ev.name+'</span>'
+        evHtml+='<div class="pr-event">'
+          +'<span class="pr-event-name">'+(isOut?'▼ ':'&#9650; ')+ev.name+'</span>'
           +'<div style="display:flex;align-items:center;gap:6px">'
-            +'<span class="pm-event-amt" style="color:'+(isOut?'var(--red)':'var(--green)')+'">'+
+            +'<span class="pr-event-amt" style="color:'+(isOut?'var(--red)':'var(--green)')+'">'+
               (isOut?'-':'+')+fE(ev.amt)+'</span>'
             +'<button style="background:none;border:none;color:var(--faint);font-size:13px;cursor:pointer" '
-              +'onclick="rmEvent('+d.mi+','+d.anno+','+ei+')">✕</button>'
+              +'onclick="rmEvent('+d.mi+','+d.anno+','+ei+')">&#x2715;</button>'
           +'</div></div>';
       });
     }
 
-    card.innerHTML='<div class="pm-status" style="background:'+dotCol+'"></div>'
-      +'<div class="pm-head">'
-        +'<div><div class="pm-title">'+MI[d.mi]+' '+d.anno+'</div>'
-          +(d.evOut>0||d.evIn>0?'<div style="font-size:11px;color:var(--muted);margin-top:2px">'
-            +(d.evOut>0?'Uscite extra: '+fE(d.evOut)+' ':'')
-            +(d.evIn>0?'Entrate extra: '+fE(d.evIn):'')+'</div>':'')
+    var alertHtml='';
+    if(d.sl<S.soglia&&d.sl>=0) alertHtml='<div class="pr-soglia-alert" style="background:var(--abg);color:var(--amber)">⚠️ Saldo sotto la soglia minima di '+fE(S.soglia)+'</div>';
+    if(d.sl<0) alertHtml='<div class="pr-soglia-alert" style="background:var(--rbg);color:var(--red)">🚨 Saldo in rosso questo mese</div>';
+
+    var card=document.createElement('div');
+    card.className='piano-row '+rowCls;
+    card.innerHTML=
+      '<div class="pr-header">'
+        +'<div class="pr-month">'+MI[d.mi]+' '+d.anno+(d.isCurrent?' <span style="font-size:11px;color:var(--blue);font-weight:400">mese aperto</span>':'')+'</div>'
+        +'<div class="pr-tag '+rowCls+'">'+tagTxt+'</div>'
+      +'</div>'
+      +'<div class="pr-grid">'
+        +'<div class="pr-cell">'
+          +'<div class="pr-cell-label">Saldo iniziale</div>'
+          +'<div class="pr-cell-val">'+fK(d.saldoInizio)+'</div>'
         +'</div>'
-        +'<div style="text-align:right">'
-          +'<div class="pm-saldo" style="color:'+col+'">'+fK(d.sl)+'</div>'
-          +'<div class="pm-note">saldo previsto</div>'
+        +'<div class="pr-cell">'
+          +'<div class="pr-cell-label">'+(d.isCurrent?'Entrate attese':'Entrate')+'</div>'
+          +'<div class="pr-cell-val" style="color:var(--green)">'+fK(d.entrate)+'</div>'
+        +'</div>'
+        +'<div class="pr-cell">'
+          +'<div class="pr-cell-label">'+(d.isCurrent?'Spese attese':'Uscite')+'</div>'
+          +'<div class="pr-cell-val" style="color:var(--red)">'+fK(d.uscite)+'</div>'
+        +'</div>'
+        +'<div class="pr-cell" style="text-align:right">'
+          +'<div class="pr-cell-label">Saldo fine mese</div>'
+          +'<div class="pr-cell-val" style="color:'+col+'">'+fK(d.sl)+'</div>'
         +'</div>'
       +'</div>'
-      +'<div class="pm-bar"><div class="pm-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'
-      +(d.sl<S.soglia&&d.sl>=0?'<div class="soglia-alert" style="background:var(--abg);color:var(--amber)">⚠️ Questo mese il saldo scende sotto la soglia minima di '+fE(S.soglia)+'</div>':'')
-      +(d.sl<0?'<div class="soglia-alert" style="background:var(--rbg);color:var(--red)">🚨 Saldo in rosso — rivedi le spese di questo mese</div>':'')
-      +(evHtml?'<div class="pm-events">'+evHtml+'</div>':'')
-      +'<button class="pm-add-btn" onclick="openEvForm('+d.mi+','+d.anno+')">+ Aggiungi evento</button>';
+      +(evHtml?'<div class="pr-events">'+evHtml+'</div>':'')
+      +alertHtml
+      +'<button class="pr-add" onclick="openEvForm('+d.mi+','+d.anno+')">+ Aggiungi evento</button>';
 
     container.appendChild(card);
   });
@@ -1703,7 +1843,7 @@ function simUpd(){
   var rs=rb-men;
   // usa projectPiano: include gli eventi pianificati (coerente con Pianifica)
   var base=projectPiano();
-  var scen=projectPiano({saldo:S.saldo-acq,risp:rs});
+  var scen=projectPiano({saldo:S.saldo-acq,saldoFine:calcSaldoFineMese()-acq,risp:rs,addRecurr:men});
   var hasEvents=S.piano.some(function(p){return p.eventi&&p.eventi.length>0;});
   var diff=scen[11].sl-base[11].sl;
   var minS=scen.reduce(function(a,b){return a.sl<b.sl?a:b;});
@@ -1787,9 +1927,22 @@ function renderGoals(){
 }
 
 // ── SETUP ──────────────────────────────────────────────────
+function aggiornaSaldoFineMese(){
+  var sa=parseFloat(document.getElementById('sSa')?document.getElementById('sSa').value:0)||0;
+  var ea=parseFloat(document.getElementById('sEntrateAttese')?document.getElementById('sEntrateAttese').value:0)||0;
+  var spa=parseFloat(document.getElementById('sSpeseAttese')?document.getElementById('sSpeseAttese').value:0)||0;
+  var fine=sa+ea-spa;
+  var el=document.getElementById('saldoFineMeseCalc');
+  if(!el) return;
+  el.textContent=fine>0?fK(fine):'\u20ac0';
+  el.style.color=fine>=(S.soglia||0)?'var(--green)':fine>=0?'var(--amber)':'var(--red)';
+}
+
 function renderSetup(){
-  var m={sSt:'stipendio',sSp:'spese',sSa:'saldo',sSog:'soglia',sTarget:'targetSaldo'};
-  for(var id in m){var e=document.getElementById(id);if(e)e.value=S[m[id]]||'';}
+  var map={sSt:'stipendio',sSp:'spese',sSa:'saldo',sSog:'soglia',sTarget:'targetSaldo',
+    sEntrateAttese:'entrateAttese',sSpeseAttese:'speseAttese'};
+  for(var id in map){var e=document.getElementById(id);if(e)e.value=S[map[id]]||'';}
+  aggiornaSaldoFineMese();
   updateBackupLabel();
 }
 function doSave(){
@@ -1798,10 +1951,12 @@ function doSave(){
   S.saldo=parseFloat(document.getElementById('sSa').value)||0;
   S.soglia=parseFloat(document.getElementById('sSog').value)||2000;
   S.targetSaldo=parseFloat(document.getElementById('sTarget').value)||0;
+  S.entrateAttese=parseFloat(document.getElementById('sEntrateAttese').value)||0;
+  S.speseAttese=parseFloat(document.getElementById('sSpeseAttese').value)||0;
   sv();
   try{
     localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));
-    localStorage.setItem(LK+'_noDemo','1'); // dati reali inseriti, non ricaricare mai il demo
+    localStorage.setItem(LK+'_noDemo','1');
   }catch(e){}
   toast('Salvato');
   setTimeout(function(){nav('oggi');},500);
@@ -1837,7 +1992,7 @@ function importBackup(ev){
         toast('File non valido');return;
       }
       showConfirm('Ripristinare il backup?','I dati attuali verranno sovrascritti.',function(){
-        Object.assign(S,{stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
+        Object.assign(S,{stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,entrateAttese:0,speseAttese:0,
           storico:[],goals:[],piano:[]},obj.state);
         sv();
         renderSetup();
@@ -1860,7 +2015,7 @@ function updateBackupLabel(){
 
 function doReset(){
   showConfirm('Reset tutti i dati','Questa azione è irreversibile. Tutto verrà cancellato.',function(){
-    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,storico:[],goals:[],piano:[]};
+    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,entrateAttese:0,speseAttese:0,storico:[],goals:[],piano:[]};
     sv();
     try{
       localStorage.removeItem(LK+'_upd');
@@ -1907,7 +2062,8 @@ function toast(msg){
 function loadDemo(){
   try{ if(localStorage.getItem(LK+'_noDemo')) return; }catch(e){}
   if(!S.stipendio&&!S.saldo){
-    S.stipendio=2000;S.spese=1600;S.saldo=8200;S.soglia=3000;S.targetSaldo=15000;
+    S.stipendio=2000;S.spese=1600;S.saldo=6700;S.soglia=3000;S.targetSaldo=15000;
+    S.entrateAttese=2000;S.speseAttese=900;
     S.storico=[
       {mi:0,anno:2026,stip:2000,spese:1580,saldo:7800},
       {mi:1,anno:2026,stip:2000,spese:1720,saldo:8080},

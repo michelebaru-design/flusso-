@@ -322,6 +322,45 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .confirm-btn.destructive{color:var(--red);font-weight:600}
 .confirm-btn.cancel{color:var(--muted)}
 
+/* SUB-NAV (dentro Piano) */
+.sub-nav{display:flex;gap:0;border-bottom:.5px solid var(--border);
+  margin:8px -18px 0;padding:0 18px;overflow-x:auto}
+.sub-nav::-webkit-scrollbar{display:none}
+.snav-btn{font-family:-apple-system,sans-serif;font-size:12px;font-weight:500;
+  color:var(--muted);padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent;
+  white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;
+  transition:all .15s;flex-shrink:0}
+.snav-btn.on{color:var(--text);border-bottom-color:var(--text)}
+.sub-page{display:none;padding-top:4px}
+.sub-page.on{display:block}
+
+/* PROSSIMA AZIONE */
+.azione-card{border-radius:14px;padding:13px 14px;margin-bottom:8px;
+  display:flex;align-items:flex-start;gap:10px}
+.az-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.az-body{flex:1}
+.az-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.az-sub{font-size:12px;opacity:.8;line-height:1.4}
+.az-btn{font-size:11px;font-weight:600;background:none;border:.5px solid currentColor;
+  border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0;
+  margin-top:1px}
+
+/* BADGE DATO REALE/STIMATO */
+.badge-dato{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;
+  letter-spacing:.4px;text-transform:uppercase;padding:2px 6px;border-radius:5px;
+  margin-left:5px;vertical-align:middle}
+.badge-reale{background:var(--gbg);color:var(--green)}
+.badge-stima{background:var(--s3);color:var(--muted)}
+
+/* KPI interpretivo — sottotitolo più lungo */
+.kpi-n{font-size:11px;color:var(--muted);line-height:1.35}
+
+/* HERO sub ora più visibile */
+.hero-sub{font-size:13px;color:var(--muted);letter-spacing:-.1px}
+.hero-sub.highlight{color:var(--green);font-weight:500}
+.hero-sub.warning{color:var(--amber);font-weight:500}
+.hero-sub.danger{color:var(--red);font-weight:500}
+
 /* TOAST */
 #toast{position:fixed;bottom:calc(var(--safe-bot) + 18px);left:50%;
   transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);
@@ -340,20 +379,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="tb-row">
     <div class="wordmark">Flusso<sup>2</sup></div>
     <div class="seg">
-      <button class="seg-btn on"  onclick="nav('home')">Home</button>
-      <button class="seg-btn"     onclick="nav('storico')">Storico</button>
-      <button class="seg-btn"     onclick="nav('pianifica')">Pianifica</button>
-      <button class="seg-btn"     onclick="nav('simula')">Simula</button>
-      <button class="seg-btn"     onclick="nav('goals')">Goals</button>
-      <button class="seg-btn"     onclick="nav('setup')">Setup</button>
+      <button class="seg-btn on"  onclick="nav('oggi')">Oggi</button>
+      <button class="seg-btn"     onclick="nav('piano')">Piano</button>
+      <button class="seg-btn"     onclick="nav('obiettivi')">Obiettivi</button>
+      <button class="seg-btn"     onclick="nav('impostazioni')">Setup</button>
     </div>
   </div>
 </div>
 
 <div id="scroll">
 
-<!-- ═══ HOME ═══════════════════════════════════════════════ -->
-<div class="screen on" id="s-home">
+<!-- ═══ OGGI ════════════════════════════════════════════════ -->
+<div class="screen on" id="s-oggi">
   <div class="hero">
     <div class="hero-label">Saldo bancario oggi</div>
     <div class="hero-num" id="hSaldo">—</div>
@@ -364,6 +401,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <div class="s-dot" id="sDot"></div>
     <div class="s-txt" id="sTxt">Nessun dato inserito</div>
   </div>
+
+  <!-- PROSSIMA AZIONE -->
+  <div id="prossimaAzione"></div>
 
   <div id="reminderBanner"></div>
   <div id="anomalyBanner"></div>
@@ -387,33 +427,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
   <div class="kgrid">
     <div class="kpi">
-      <div class="kpi-l">Risparmio netto</div>
+      <div class="kpi-l">Risparmi questo mese</div>
       <div class="kpi-v" id="kNetto">—</div>
-      <div class="kpi-n">questo mese</div>
+      <div class="kpi-n" id="kNettoN">—</div>
     </div>
     <div class="kpi">
-      <div class="kpi-l">Tasso risparmio</div>
+      <div class="kpi-l">Del tuo stipendio</div>
       <div class="kpi-v" id="kTasso">—</div>
-      <div class="kpi-n" id="kTassoN">dello stipendio</div>
+      <div class="kpi-n" id="kTassoN">—</div>
     </div>
   </div>
   <div class="kgrid">
     <div class="kpi">
-      <div class="kpi-l">Media storica</div>
+      <div class="kpi-l">Risparmio medio reale</div>
       <div class="kpi-v" id="kMedia">—</div>
-      <div class="kpi-n">risparmio/mese</div>
+      <div class="kpi-n" id="kMediaN">—</div>
     </div>
     <div class="kpi">
-      <div class="kpi-l">Proiezione 12m</div>
+      <div class="kpi-l">Tra 12 mesi avrai</div>
       <div class="kpi-v" id="kProj">—</div>
-      <div class="kpi-n">saldo tra 1 anno</div>
+      <div class="kpi-n" id="kProjN">—</div>
     </div>
   </div>
 
   <div class="soglia-card">
     <div class="soglia-top">
       <div>
-        <div class="soglia-lbl">Sopra la soglia</div>
+        <div class="soglia-lbl">Margine disponibile</div>
         <div class="soglia-lbl" id="sogliaNote" style="font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;margin-top:2px">—</div>
       </div>
       <div class="soglia-disp" id="sogliaDisp">—</div>
@@ -442,7 +482,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
   <div class="upd-row">
     <span class="upd-note" id="lastUpd">Mai aggiornato</span>
-    <button class="link-btn" onclick="nav('setup')">Aggiorna →</button>
+    <button class="link-btn" onclick="nav('impostazioni')">Aggiorna →</button>
   </div>
 
   <!-- OBIETTIVO SALDO -->
@@ -465,7 +505,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 
   <!-- TREND RISPARMIO -->
-  <div class="stitle">Trend risparmio</div>
+  <div class="stitle">Andamento risparmio</div>
   <div class="card" id="trendCard">
     <div class="card-body" style="padding-bottom:8px">
       <svg class="chart-svg" id="trendChart" height="70" viewBox="0 0 340 70"></svg>
@@ -474,8 +514,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 </div>
 
-<!-- ═══ STORICO ════════════════════════════════════════════ -->
-<div class="screen" id="s-storico">
+<!-- ═══ PIANO ════════════════════════════════════════════════ -->
+<div class="screen" id="s-piano">
+  <div class="sub-nav">
+    <button class="snav-btn on" onclick="subNav('p-piano')">Piano 12m</button>
+    <button class="snav-btn" onclick="subNav('p-storico')">Storico</button>
+    <button class="snav-btn" onclick="subNav('p-simula')">Simula</button>
+  </div>
+
+  <!-- SUB: PIANIFICA -->
+  <!-- SUB: PIANIFICA = STORICO CONTENT -->
+  <div class="sub-page" id="sp-pianifica">
   <div class="stitle" style="margin-top:4px">Mesi passati</div>
   <div class="card" id="storicoCard">
     <div class="card-body" style="padding:2px 13px 10px" id="storicoList"></div>
@@ -548,84 +597,74 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
     <button class="pri-btn" onclick="addMese()">Salva mese</button>
   </div>
-</div>
+  </div><!-- /sp-pianifica storico -->
 
-<!-- ═══ PIANIFICA ══════════════════════════════════════════ -->
-<div class="screen" id="s-pianifica">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px">
-    <div class="stitle" style="margin:0">Prossimi 12 mesi</div>
-    <div style="font-size:11px;color:var(--muted)" id="pianoBase"></div>
-  </div>
-
-  <!-- TRAIETTORIA -->
-  <div class="card" id="pianoChartCard">
-    <div class="card-body" style="padding:13px 13px 8px">
-      <svg class="chart-svg" id="pianoChart" height="104" viewBox="0 0 340 104"></svg>
-      <div class="ml" id="pianoML"></div>
-      <div style="display:flex;gap:12px;margin-top:7px;padding-top:7px;border-top:.5px solid var(--border)">
-        <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>OK</div>
-        <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div>Sotto soglia</div>
-        <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div>In rosso</div>
-        <div class="leg"><div style="width:11px;height:11px;border-radius:50%;background:var(--s3);border:2px solid var(--text)"></div>Con eventi</div>
+  <!-- SUB: PIANO 12M -->
+  <div class="sub-page on" id="sp-piano">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 12px">
+      <div class="stitle" style="margin:0">Prossimi 12 mesi</div>
+      <div style="font-size:11px;color:var(--muted)" id="pianoBase"></div>
+    </div>
+    <div class="card" id="pianoChartCard">
+      <div class="card-body" style="padding:13px 13px 8px">
+        <svg class="chart-svg" id="pianoChart" height="104" viewBox="0 0 340 104"></svg>
+        <div class="ml" id="pianoML"></div>
+        <div style="display:flex;gap:12px;margin-top:7px;padding-top:7px;border-top:.5px solid var(--border)">
+          <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>OK</div>
+          <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div>Sotto soglia</div>
+          <div class="leg"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div>In rosso</div>
+          <div class="leg"><div style="width:11px;height:11px;border-radius:50%;background:var(--s3);border:2px solid var(--text)"></div>Con eventi</div>
+        </div>
       </div>
     </div>
-  </div>
-
-  <div id="pianoList"></div>
-
-  <!-- event form -->
-  <div class="ev-form" id="evForm">
-    <div style="font-size:13px;font-weight:600;margin-bottom:10px" id="evFormTitle">Aggiungi evento</div>
-    <div class="frow">
-      <div class="field"><label>Nome evento</label>
-        <input type="text" id="evN" placeholder="Vacanze" maxlength="20">
+    <div id="pianoList"></div>
+    <div class="ev-form" id="evForm">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px" id="evFormTitle">Aggiungi evento</div>
+      <div class="frow">
+        <div class="field"><label>Nome evento</label><input type="text" id="evN" placeholder="Vacanze" maxlength="20"></div>
+        <div class="field"><label>Importo €</label><input type="number" id="evAmt" placeholder="1500" inputmode="decimal"></div>
       </div>
-      <div class="field"><label>Importo €</label>
-        <input type="number" id="evAmt" placeholder="1500" inputmode="decimal">
+      <div class="frow full">
+        <div class="field"><label>Tipo</label>
+          <select id="evTipo">
+            <option value="out">Uscita straordinaria</option>
+            <option value="in">Entrata straordinaria</option>
+          </select>
+        </div>
       </div>
-    </div>
-    <div class="frow full">
-      <div class="field"><label>Tipo</label>
-        <select id="evTipo">
-          <option value="out">Uscita straordinaria</option>
-          <option value="in">Entrata straordinaria</option>
-        </select>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="sec-btn" style="margin:0;flex:1" onclick="closeEvForm()">Annulla</button>
+        <button class="pri-btn" style="margin:0;flex:1" onclick="saveEvent()">Salva</button>
       </div>
     </div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="sec-btn" style="margin:0;flex:1" onclick="closeEvForm()">Annulla</button>
-      <button class="pri-btn" style="margin:0;flex:1" onclick="saveEvent()">Salva</button>
-    </div>
-  </div>
-</div>
+  </div><!-- /sp-piano -->
 
-<!-- ═══ SIMULA ═════════════════════════════════════════════ -->
-<div class="screen" id="s-simula">
-  <div class="stitle" style="margin-top:4px">Posso permettermi…</div>
-  <div class="sl-card">
-    <div class="sl-h"><span class="sl-l">Acquisto una tantum</span><span class="sl-v" id="sv1">€0</span></div>
-    <input type="range" min="0" max="20000" step="100" value="0" id="sl1" oninput="simUpd()">
-  </div>
-  <div class="sl-card">
-    <div class="sl-h"><span class="sl-l">Nuova spesa mensile</span><span class="sl-v" id="sv2">€0</span></div>
-    <input type="range" min="0" max="2000" step="10" value="0" id="sl2" oninput="simUpd()">
-  </div>
-  <div class="sim-ans" id="simAns"></div>
-  <div class="cmp-card">
-    <div class="card-head" style="padding:9px 0;border:none">
-      <span class="ch-t">Base vs scenario</span>
+  <!-- SUB: SIMULA -->
+  <div class="sub-page" id="sp-simula">
+    <div class="stitle" style="margin-top:12px">Posso permettermi…</div>
+    <div class="sl-card">
+      <div class="sl-h"><span class="sl-l">Acquisto una tantum</span><span class="sl-v" id="sv1">€0</span></div>
+      <input type="range" min="0" max="20000" step="100" value="0" id="sl1" oninput="simUpd()">
     </div>
-    <svg class="chart-svg" id="simChart" height="88" viewBox="0 0 340 88"></svg>
-    <div class="ml" id="simML"></div>
-    <div class="legend">
-      <div class="leg"><div class="leg-l" style="background:var(--text)"></div>Base</div>
-      <div class="leg"><div class="leg-l" style="border-top:2px dashed var(--red);height:0;border-radius:0"></div>Scenario</div>
+    <div class="sl-card">
+      <div class="sl-h"><span class="sl-l">Nuova spesa mensile</span><span class="sl-v" id="sv2">€0</span></div>
+      <input type="range" min="0" max="2000" step="10" value="0" id="sl2" oninput="simUpd()">
     </div>
-  </div>
-</div>
+    <div class="sim-ans" id="simAns"></div>
+    <div class="cmp-card">
+      <div class="card-head" style="padding:9px 0;border:none"><span class="ch-t">Base vs scenario</span></div>
+      <svg class="chart-svg" id="simChart" height="88" viewBox="0 0 340 88"></svg>
+      <div class="ml" id="simML"></div>
+      <div class="legend">
+        <div class="leg"><div class="leg-l" style="background:var(--text)"></div>Base</div>
+        <div class="leg"><div class="leg-l" style="border-top:2px dashed var(--red);height:0;border-radius:0"></div>Scenario</div>
+      </div>
+    </div>
+  </div><!-- /sp-simula -->
 
-<!-- ═══ GOALS ══════════════════════════════════════════════ -->
-<div class="screen" id="s-goals">
+</div><!-- /s-piano -->
+<!-- ═══ OBIETTIVI ══════════════════════════════════════════════ -->
+<div class="screen" id="s-obiettivi">
   <div class="stitle" style="margin-top:4px">Obiettivi</div>
   <div id="goalsList"></div>
   <div class="divider"></div>
@@ -643,8 +682,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 </div>
 
-<!-- ═══ SETUP ══════════════════════════════════════════════ -->
-<div class="screen" id="s-setup">
+<!-- ═══ IMPOSTAZIONI ══════════════════════════════════════════════ -->
+<div class="screen" id="s-impostazioni">
   <div class="stitle" style="margin-top:4px">Questo mese</div>
   <div class="fc">
     <div class="frow">
@@ -716,7 +755,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 var MIF=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 var LK='flusso2_v2';
-var TABS=['home','storico','pianifica','simula','goals','setup'];
+var TABS=['oggi','piano','obiettivi','impostazioni'];
 
 var S={
   stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,
@@ -826,12 +865,133 @@ function nav(id){
   document.querySelectorAll('.seg-btn').forEach(function(b,i){b.classList.toggle('on',TABS[i]===id);});
   var pg=document.getElementById('s-'+id); if(pg) pg.classList.add('on');
   document.getElementById('scroll').scrollTop=0;
-  if(id==='home')     renderHome();
-  if(id==='storico')  renderStorico();
-  if(id==='pianifica')renderPiano();
-  if(id==='simula')   simUpd();
-  if(id==='goals')    renderGoals();
-  if(id==='setup')    renderSetup();
+  if(id==='oggi')        {renderHome();}
+  if(id==='piano')       {subNav('p-piano');}
+  if(id==='obiettivi')   {renderGoals();}
+  if(id==='impostazioni'){renderSetup();}
+}
+
+function subNav(subId){
+  document.querySelectorAll('.sub-page').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.snav-btn').forEach(function(b,i){
+    b.classList.toggle('on',['p-piano','p-storico','p-simula'][i]===subId);
+  });
+  // p-piano -> sp-piano (pianifica 12m), p-storico -> sp-pianifica (storico), p-simula -> sp-simula
+  var subIdMap={'p-piano':'sp-piano','p-storico':'sp-pianifica','p-simula':'sp-simula'};
+  var pg=document.getElementById(subIdMap[subId]);
+  if(pg) pg.classList.add('on');
+  if(subId==='p-storico') renderStorico();
+  if(subId==='p-piano')   renderPiano();
+  if(subId==='p-simula')  simUpd();
+}
+
+// ── PROSSIMA AZIONE ────────────────────────────────────────
+function renderProssimaAzione(){
+  var el=document.getElementById('prossimaAzione'); if(!el) return;
+  el.innerHTML='';
+  if(!S.stipendio) return;
+
+  var now=new Date();
+  var media=mediaRisp();
+  var netto=S.stipendio-S.spese;
+  var disponibile=S.saldo-S.soglia;
+  var piano=projectPiano();
+
+  // Regola 1: saldo sotto soglia (emergenza)
+  if(S.saldo>0&&S.saldo<S.soglia){
+    return mkAzione('danger','🚨','Saldo sotto la soglia minima',
+      'Hai '+fE(Math.abs(disponibile))+' in meno rispetto al tuo minimo di '+fE(S.soglia)+'. Rivedi le spese.',
+      null);
+  }
+
+  // Regola 2: risparmio negativo
+  if(netto<0){
+    return mkAzione('danger','⚠️','Questo mese le uscite superano le entrate',
+      'Stai spendendo '+fE(Math.abs(netto))+' più di quello che guadagni.',
+      null);
+  }
+
+  // Regola 3: mese critico nei prossimi 3 mesi
+  var critMese=null;
+  for(var i=0;i<3;i++){if(piano[i].sl<S.soglia){critMese=piano[i];break;}}
+  if(critMese){
+    return mkAzione('warning','📅',MI[critMese.mi]+': saldo vicino alla soglia',
+      'Tra '+( i+1)+' mes'+(i===0?'e':'i')+' il saldo scende a '+fK(critMese.sl)+'. Pianifica eventuali spese.',
+      function(){nav('piano');setTimeout(function(){subNav('p-piano');},100);});
+  }
+
+  // Regola 4: Setup non aggiornato da più di 25 giorni
+  try{
+    var upd=localStorage.getItem(LK+'_upd');
+    if(upd){
+      var p=upd.split('/');
+      if(p.length===3){
+        var last=new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));
+        var giorni=Math.floor((now-last)/86400000);
+        if(giorni>=25){
+          return mkAzione('info','📋','Aggiorna i dati del mese',
+            'Ultimo aggiornamento '+giorni+' giorni fa. Inserisci il saldo attuale.',
+            function(){nav('impostazioni');});
+        }
+      }
+    }
+  }catch(e){}
+
+  // Regola 5: mese precedente non nello storico (siamo dopo il 25)
+  if(now.getDate()>=25){
+    var mesePrecIdx=(now.getMonth()-1+12)%12;
+    var annoPre=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();
+    var hasMese=S.storico.some(function(m){return m.mi===mesePrecIdx&&m.anno===annoPre;});
+    if(!hasMese){
+      return mkAzione('info','📝','Registra '+MI[mesePrecIdx]+' nello Storico',
+        'Fine mese vicina — inserisci le spese effettive per aggiornare le proiezioni.',
+        function(){nav('piano');});
+    }
+  }
+
+  // Regola 6: obiettivo in ritardo
+  var goalLento=null;
+  for(var g=0;g<S.goals.length;g++){
+    var gg=S.goals[g];
+    var rem=gg.target-gg.current;
+    var mens=gg.monthly>0?gg.monthly:(media&&media>0?media*0.3:0);
+    var mths=mens>0?Math.ceil(rem/mens):9999;
+    if(mths>24&&rem>0){goalLento=gg;break;}
+  }
+  if(goalLento){
+    return mkAzione('info','🎯','Obiettivo "'+goalLento.name+'" è lento',
+      'Al ritmo attuale ci vorranno molti mesi. Valuta di dedicare di più.',
+      function(){nav('obiettivi');});
+  }
+
+  // Regola 7: tutto ok
+  mkAzione('ok','✓','Tutto in ordine',
+    'Proiezione positiva per i prossimi 12 mesi. Prossimo aggiornamento: fine mese.',
+    null);
+}
+
+function mkAzione(type,icon,title,sub,action){
+  var el=document.getElementById('prossimaAzione'); if(!el) return;
+  var cols={
+    danger:{bg:'var(--rbg)',col:'var(--red)'},
+    warning:{bg:'var(--abg)',col:'var(--amber)'},
+    info:{bg:'var(--bbg)',col:'var(--blue)'},
+    ok:{bg:'var(--gbg)',col:'var(--green)'}
+  };
+  var c=cols[type]||cols.ok;
+  var btnHtml=action?'<button class="az-btn" style="color:'+c.col+'" id="azBtn">Vai →</button>':'';
+  el.innerHTML='<div class="azione-card" style="background:'+c.bg+'">'
+    +'<div class="az-icon">'+icon+'</div>'
+    +'<div class="az-body">'
+      +'<div class="az-title" style="color:'+c.col+'">'+title+'</div>'
+      +'<div class="az-sub" style="color:'+c.col+'">'+sub+'</div>'
+    +'</div>'
+    +btnHtml
+    +'</div>';
+  if(action){
+    var btn=document.getElementById('azBtn');
+    if(btn) btn.addEventListener('click',action);
+  }
 }
 
 // ── HOME ───────────────────────────────────────────────────
@@ -842,54 +1002,92 @@ function renderHome(){
   var proj=projectBase(S.saldo, rispMese);
   var disponibile=S.saldo-S.soglia;
   var tasso=S.stipendio>0?Math.round(netto/S.stipendio*100):0;
+  var isReal=S.storico.length>0; // abbiamo dati storici reali
 
-  // hero
+  // ── HERO: linguaggio interpretivo ──
   var hEl=document.getElementById('hSaldo');
   hEl.textContent=S.saldo>0?fK(S.saldo):'—';
   hEl.style.color=S.saldo>0?(disponibile>=0?'var(--text)':'var(--red)'):'var(--muted)';
-  document.getElementById('hSub').textContent=
-    S.stipendio>0?('Soglia '+fE(S.soglia)+' · sopra: '+fS(disponibile)):
-    'Configura i dati in Setup';
+  var hSub=document.getElementById('hSub');
+  if(S.stipendio>0){
+    if(disponibile>=0){
+      hSub.textContent='Hai '+fE(disponibile)+' di margine disponibile';
+      hSub.className='hero-sub highlight';
+    } else {
+      hSub.textContent='Sei '+fE(Math.abs(disponibile))+' sotto la soglia minima';
+      hSub.className='hero-sub danger';
+    }
+  } else {
+    hSub.textContent='Configura i dati in Impostazioni';
+    hSub.className='hero-sub';
+  }
 
-  // kpi
+  // ── KPI: linguaggio interpretivo + badge reale/stimato ──
+  var badgeR='<span class="badge-dato badge-reale">● reale</span>';
+  var badgeS='<span class="badge-dato badge-stima">○ stima</span>';
+
   var kn=document.getElementById('kNetto');
   kn.textContent=S.stipendio>0?fS(netto):'—';
   kn.style.color=netto>=0?'var(--green)':'var(--red)';
+  var knN=document.getElementById('kNettoN');
+  if(S.stipendio>0){
+    var neText=netto>=0?('su '+fE(S.stipendio)+' di stipendio'):('spendi '+fE(Math.abs(netto))+' in più');
+    knN.innerHTML=neText+badgeS;
+  } else { knN.innerHTML='—'; }
+
   var kt=document.getElementById('kTasso');
   kt.textContent=S.stipendio>0?fPct(tasso):'—';
   kt.style.color=S.stipendio===0?'var(--muted)':tasso>=20?'var(--green)':tasso>=10?'var(--amber)':'var(--red)';
-  document.getElementById('kTassoN').textContent=
-    S.stipendio===0?'dello stipendio':tasso>=20?'ottimo ≥20%':tasso>=10?'nella norma':'sotto 10%';
+  var ktN=document.getElementById('kTassoN');
+  if(S.stipendio>0){
+    var taText=tasso>=20?'ottimo, sei sopra il 20%':tasso>=10?'nella norma':tasso>0?'troppo basso':'tutto speso';
+    ktN.innerHTML=taText+badgeS;
+  } else { ktN.innerHTML='dello stipendio'; }
+
   var km=document.getElementById('kMedia');
   km.textContent=media!==null?fK(media):'—';
   km.style.color=media!==null&&media<0?'var(--red)':'var(--text)';
+  var kmN=document.getElementById('kMediaN');
+  if(media!==null){
+    kmN.innerHTML='su '+S.storico.length+' mes'+(S.storico.length===1?'e':'i')+badgeR;
+  } else { kmN.innerHTML='aggiungi storico'+badgeS; }
+
   var kp=document.getElementById('kProj');
   kp.textContent=S.stipendio>0?fK(proj[11].sl):'—';
   kp.style.color=proj[11].sl>=0?'var(--text)':'var(--red)';
+  var kpN=document.getElementById('kProjN');
+  if(S.stipendio>0){
+    kpN.innerHTML=(proj[11].sl>=0?'in banca tra 12 mesi':'in rosso tra 12 mesi')+(isReal?badgeR:badgeS);
+  } else { kpN.innerHTML='—'; }
+
   document.getElementById('projNote').textContent=
     media!==null?'basata su '+S.storico.length+' mesi reali':'stima · aggiungi storico';
 
-  // soglia
+  // ── SOGLIA ──
   var maxB=Math.max(S.saldo,S.soglia*1.5,1);
   var fp=Math.min(100,S.saldo/maxB*100);
   var pp=Math.min(97,S.soglia/maxB*100);
   var sf=document.getElementById('sogliaFill');
-  var sp=document.getElementById('sogliaPin');
+  var spPin=document.getElementById('sogliaPin');
   if(sf){sf.style.background=disponibile>=0?'var(--green)':'var(--red)';
     setTimeout(function(){sf.style.width=fp+'%';},80);}
-  if(sp) sp.style.left=pp+'%';
+  if(spPin) spPin.style.left=pp+'%';
   var sd=document.getElementById('sogliaDisp');
   sd.textContent=S.saldo>0?fS(disponibile):'—';
   sd.style.color=disponibile>=0?'var(--green)':'var(--red)';
-  document.getElementById('sogliaNote').textContent='Soglia minima: '+fE(S.soglia);
+  document.getElementById('sogliaNote').textContent=
+    S.saldo>0?(disponibile>=0?'Soglia minima '+fE(S.soglia)+' — stai bene':'Sotto la soglia minima di '+fE(S.soglia)):'Imposta la soglia in Impostazioni';
   document.getElementById('sogliaMid').textContent='Soglia '+fK(S.soglia);
   document.getElementById('sogliaTot').textContent=fK(S.saldo);
 
-  // banners
+  // ── PROSSIMA AZIONE ──
+  renderProssimaAzione();
+
+  // ── BANNERS ──
   renderReminder();
   renderAnomaly(netto,media);
 
-  // chart
+  // ── CHART ──
   var svgHC=document.getElementById('homeChart');
   if(svgHC) svgHC.innerHTML='';
   if(S.stipendio>0){
@@ -899,7 +1097,7 @@ function renderHome(){
     var mlHC=document.getElementById('homeML'); if(mlHC) mlHC.innerHTML='';
   }
 
-  // status
+  // ── STATUS ──
   var dot=document.getElementById('sDot');
   var bar=document.getElementById('statusBar');
   var txt=document.getElementById('sTxt');
@@ -908,7 +1106,7 @@ function renderHome(){
     bar.style.cssText='display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:12px;margin-bottom:12px;background:'+bg;
     txt.textContent=msg; txt.style.color=col;
   }
-  if(S.stipendio===0) setStatus('var(--faint)','var(--s2)','Nessun dato — vai in Setup');
+  if(S.stipendio===0) setStatus('var(--faint)','var(--s2)','Nessun dato — vai in Impostazioni');
   else if(disponibile<0||netto<0) setStatus('var(--red)','var(--rbg)','Attenzione: situazione critica');
   else if(tasso<10||disponibile<300) setStatus('var(--amber)','var(--abg)','Margine stretto — tieni d\'occhio');
   else setStatus('var(--green)','var(--gbg)','Tutto in ordine');
@@ -1602,7 +1800,7 @@ function doSave(){
     localStorage.setItem(LK+'_noDemo','1'); // dati reali inseriti, non ricaricare mai il demo
   }catch(e){}
   toast('Salvato');
-  setTimeout(function(){nav('home');},500);
+  setTimeout(function(){nav('oggi');},500);
 }
 function exportBackup(){
   try{
@@ -1640,7 +1838,7 @@ function importBackup(ev){
         sv();
         renderSetup();
         toast('Backup ripristinato');
-        setTimeout(function(){nav('home');},500);
+        setTimeout(function(){nav('oggi');},500);
       });
     }catch(err){toast('File corrotto');}
     ev.target.value='';

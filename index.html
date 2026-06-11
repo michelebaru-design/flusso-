@@ -115,20 +115,6 @@ body{width:100%;height:100%;min-height:-webkit-fill-available;background:var(--b
 .banner-btn{font-size:11px;font-weight:600;background:none;border:.5px solid currentColor;
   border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;flex-shrink:0}
 
-/* WEEKLY BARS */
-.week-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
-  padding:13px;margin-bottom:8px}
-.wk-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.wk-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.5px;margin-bottom:2px}
-.wk-sub{font-size:11px;color:var(--muted)}
-.wk-num{font-size:26px;font-weight:700;letter-spacing:-1px;line-height:1}
-.wk-vs{font-size:11px;margin-top:2px}
-.wk-bars{display:flex;gap:4px;align-items:flex-end;height:36px}
-.wk-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px}
-.wk-lbls{display:flex;gap:4px;margin-top:3px}
-.wk-lbl2{flex:1;text-align:center;font-size:9px;color:var(--muted)}
-
 /* CHART */
 .chart-svg{width:100%;display:block;overflow:visible}
 .ml{display:flex;justify-content:space-between;margin-top:3px}
@@ -433,17 +419,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  <!-- WATERFALL: DOVE VA LO STIPENDIO -->
-  <div class="card" id="waterfallCard" style="display:none">
-    <div class="card-head">
-      <span class="ch-t">Dove va lo stipendio</span>
-      <span class="ch-s" id="wfNote">struttura mensile</span>
-    </div>
-    <div class="card-body" style="padding:13px 8px 6px">
-      <svg class="chart-svg" id="waterfallChart" height="128" viewBox="0 0 340 128"></svg>
-    </div>
-  </div>
-
   <div class="soglia-card">
     <div class="soglia-top">
       <div>
@@ -461,21 +436,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <span id="sogliaMid">Soglia</span>
       <span id="sogliaTot">—</span>
     </div>
-  </div>
-
-  <div class="week-card" id="weekCard">
-    <div class="wk-head">
-      <div>
-        <div class="wk-lbl">Weekly recap</div>
-        <div class="wk-sub" id="wkSub">Questa settimana</div>
-      </div>
-      <div>
-        <div class="wk-num" id="wkNum">—</div>
-        <div class="wk-vs" id="wkVs"></div>
-      </div>
-    </div>
-    <div class="wk-bars" id="wkBars"></div>
-    <div class="wk-lbls" id="wkLbls"></div>
   </div>
 
   <div class="card">
@@ -774,7 +734,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <script>
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 var MIF=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-var WD=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
 var LK='flusso2_v2';
 var TABS=['home','storico','pianifica','simula','goals','setup'];
 
@@ -951,9 +910,6 @@ function renderHome(){
   renderReminder();
   renderAnomaly(netto,media);
 
-  // weekly
-  renderWeekly();
-
   // chart
   var svgHC=document.getElementById('homeChart');
   if(svgHC) svgHC.innerHTML='';
@@ -984,7 +940,6 @@ function renderHome(){
   renderTargetSaldo();
   renderTrend();
   renderBudget();
-  renderWaterfall();
 }
 
 function renderReminder(){
@@ -1016,56 +971,25 @@ function renderReminder(){
 
 function renderAnomaly(netto,media){
   var el=document.getElementById('anomalyBanner'); if(!el) return; el.innerHTML='';
+  // anomalia solo se c'è storico con almeno 2 mesi
   if(media===null||S.storico.length<2) return;
-  var diff=netto-media;
+  // usa SOLO l'ultimo mese dello storico (dati reali), non la stima del Setup
+  var ultimo=S.storico[S.storico.length-1];
+  var nettoReale=ultimo.stip-ultimo.spese;
+  var diff=nettoReale-media;
   if(Math.abs(diff)<Math.abs(media)*0.2) return;
   var isNeg=diff<0;
   var col=isNeg?'var(--red)':'var(--green)';
   var bg=isNeg?'var(--rbg)':'var(--gbg)';
   var pct=media!==0?Math.round(Math.abs(diff)/Math.abs(media)*100):0;
-  var t=isNeg?'⚠️ Mese anomalo — spese più alte del solito':'🎉 Mese positivo — spese sotto la media';
+  var meseLabel=MI[ultimo.mi]+' '+ultimo.anno;
+  var t=isNeg?'⚠️ '+meseLabel+' — spese più alte del solito':'🎉 '+meseLabel+' — spese sotto la media';
   var d=isNeg?
-    ('Risparmi '+fK(Math.abs(diff))+' in meno della tua media ('+fK(media)+'/mese). +'+pct+'%'):
-    ('Risparmi '+fK(diff)+' in più della tua media ('+fK(media)+'/mese). -'+pct+'%');
+    ('Hai risparmiato '+fK(Math.abs(diff))+' in meno della media ('+fK(media)+'/mese). +'+pct+'%'):
+    ('Hai risparmiato '+fK(diff)+' in più della media ('+fK(media)+'/mese). -'+pct+'%');
   el.innerHTML='<div class="banner" style="background:'+bg+'">'
     +'<div class="banner-body"><div class="bn-t" style="color:'+col+'">'+t+'</div>'
     +'<div class="bn-s" style="color:'+col+'">'+d+'</div></div></div>';
-}
-
-function renderWeekly(){
-  var now=new Date();
-  var spGiorno=S.spese>0?S.spese/30:0;
-  if(!spGiorno){document.getElementById('wkNum').textContent='—';return;}
-  var days=[],maxD=0;
-  var seed=now.getDate()*31+now.getMonth();
-  for(var i=0;i<7;i++){
-    var v=Math.round(spGiorno*(0.5+((seed*7+i*13)%100)/100));
-    days.push(v); if(v>maxD) maxD=v;
-  }
-  maxD=maxD||1;
-  var tot=days.reduce(function(a,b){return a+b;},0);
-  var media7=Math.round(spGiorno*7);
-  var diff=tot-media7;
-  var sett=Math.ceil(now.getDate()/7);
-  document.getElementById('wkSub').textContent='Settimana '+sett+' · '+MI[now.getMonth()]+' · stima';
-  var wn=document.getElementById('wkNum');
-  wn.textContent=fE(tot); wn.style.color=diff>0?'var(--red)':'var(--green)';
-  var wv=document.getElementById('wkVs');
-  wv.textContent=(diff>0?'▲ +':'▼ ')+fE(Math.abs(diff))+' vs media';
-  wv.style.color=diff>0?'var(--red)':'var(--green)';
-  var bars=document.getElementById('wkBars'); bars.innerHTML='';
-  var lbls=document.getElementById('wkLbls'); lbls.innerHTML='';
-  days.forEach(function(v,i){
-    var d=document.createElement('div'); d.className='wk-bar';
-    d.style.cssText='flex:1;border-radius:3px 3px 0 0;height:3px;background:var(--s3);transition:height .5s '+(.05*i)+'s';
-    bars.appendChild(d);
-    var col=v>spGiorno*1.3?'var(--red)':v>spGiorno*1.1?'var(--amber)':'var(--green)';
-    setTimeout((function(el,hh,cc){return function(){el.style.height=hh+'px';el.style.background=cc;};})(d,Math.round(v/maxD*34)+3,col),i*55+200);
-    var l=document.createElement('div'); l.className='wk-lbl2';
-    var today=now.getDay()||7;
-    var di=((today-1-(6-i))+7)%7;
-    l.textContent=WD[di].slice(0,1); lbls.appendChild(l);
-  });
 }
 
 // ── BUDGET DEL MESE ────────────────────────────────────────
@@ -1119,85 +1043,6 @@ function renderBudget(){
     document.getElementById('bgFill').style.background=fillCol;
     document.getElementById('bgMarker').style.left=pctTempo+'%';
   },100);
-}
-
-// ── WATERFALL: DOVE VA LO STIPENDIO ────────────────────────
-function renderWaterfall(){
-  var card=document.getElementById('waterfallCard');
-  var svg=document.getElementById('waterfallChart');
-  if(!card||!svg) return;
-  if(!S.stipendio||S.stipendio<=0){card.style.display='none';return;}
-  card.style.display='block';
-  svg.innerHTML='';
-  var W=340,H=128;
-  var tfTot=tfx();
-  // costruisci le voci: stipendio, ogni costo fisso, variabili, risparmio
-  var voci=[{label:'Stipendio',val:S.stipendio,type:'in'}];
-  // aggrega costi fissi - se troppi (>4), raggruppa i più piccoli
-  var fixed=S.fixed.slice().sort(function(a,b){return b.amt-a.amt;});
-  var maxFixed=4;
-  if(fixed.length<=maxFixed){
-    fixed.forEach(function(f){voci.push({label:f.name,val:f.amt,type:'out'});});
-  } else {
-    fixed.slice(0,maxFixed-1).forEach(function(f){voci.push({label:f.name,val:f.amt,type:'out'});});
-    var altri=fixed.slice(maxFixed-1).reduce(function(a,f){return a+f.amt;},0);
-    voci.push({label:'Altri fissi',val:altri,type:'out'});
-  }
-  if(S.variabili>0) voci.push({label:'Variabili',val:S.variabili,type:'out'});
-  var risp=S.stipendio-tfTot-S.variabili;
-  voci.push({label:'Risparmio',val:Math.abs(risp),type:risp>=0?'save':'deficit'});
-  // calcola scale
-  var maxVal=S.stipendio;
-  var padX=10,padY=6,barTop=8;
-  var n=voci.length;
-  var availW=W-padX*2;
-  var gap=4;
-  var barW=(availW-gap*(n-1))/n;
-  var barAreaH=H-padY-barTop-22; // 22 per labels sotto
-  // soglia per mostrare il valore: solo barre alte abbastanza
-  voci.forEach(function(v,i){
-    var hh=Math.round((v.val/maxVal)*barAreaH);
-    if(hh<2) hh=2;
-    var x=padX+i*(barW+gap);
-    var y=padY+barTop+(barAreaH-hh);
-    var col;
-    if(v.type==='in') col='var(--green)';
-    else if(v.type==='save') col=risp>=0?'var(--blue)':'var(--red)';
-    else if(v.type==='deficit') col='var(--red)';
-    else col='var(--red)';
-    // bar with rounded top
-    var rect=svgEl('rect',{x:x.toFixed(1),y:(y+hh).toFixed(1),width:barW.toFixed(1),
-      height:'0',rx:'3',fill:col,opacity:'.92'});
-    svg.appendChild(rect);
-    setTimeout((function(r,yy,hhh){return function(){
-      r.style.transition='y .6s cubic-bezier(.22,1,.36,1), height .6s cubic-bezier(.22,1,.36,1)';
-      r.setAttribute('y',yy.toFixed(1));
-      r.setAttribute('height',hhh.toFixed(1));
-    };})(rect,y,hh),60+i*55);
-    // valore sopra la barra
-    var valTxt=svgEl('text',{x:(x+barW/2).toFixed(1),y:(y-3).toFixed(1),
-      'text-anchor':'middle','font-size':'10','font-weight':'600',
-      fill:col,'font-family':'Inter'});
-    valTxt.textContent=fK(v.val);
-    valTxt.style.opacity='0';
-    valTxt.style.transition='opacity .3s ease '+(0.25+i*0.05)+'s';
-    svg.appendChild(valTxt);
-    setTimeout(function(){valTxt.style.opacity='1';},100);
-    // label sotto
-    var lbl=svgEl('text',{x:(x+barW/2).toFixed(1),y:(H-10).toFixed(1),
-      'text-anchor':'middle','font-size':'9.5',
-      fill:'var(--muted)','font-family':'Inter'});
-    var labelText=v.label;
-    if(labelText.length>9) labelText=labelText.substring(0,8)+'.';
-    lbl.textContent=labelText;
-    svg.appendChild(lbl);
-  });
-  // nota
-  var noteEl=document.getElementById('wfNote');
-  if(noteEl){
-    if(risp>=0) noteEl.textContent='Ti restano '+fE(risp);
-    else noteEl.textContent='Deficit di '+fE(-risp);
-  }
 }
 
 // ── OBIETTIVO SALDO ────────────────────────────────────────

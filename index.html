@@ -140,26 +140,6 @@ body{width:100%;height:100%;min-height:-webkit-fill-available;background:var(--b
   color:var(--faint);line-height:1}
 .mr-btn.edit{color:var(--blue)}
 
-/* PIANIFICA */
-.piano-month{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
-  padding:13px;margin-bottom:8px;position:relative}
-.pm-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.pm-title{font-size:14px;font-weight:600;letter-spacing:-.2px}
-.pm-saldo{font-size:20px;font-weight:700;letter-spacing:-.5px;line-height:1}
-.pm-note{font-size:11px;color:var(--muted);margin-top:1px}
-.pm-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin:8px 0}
-.pm-bar-fill{height:100%;border-radius:2px}
-.pm-events{display:flex;flex-direction:column;gap:4px;margin-top:6px}
-.pm-event{display:flex;align-items:center;justify-content:space-between;
-  padding:5px 8px;border-radius:8px;background:var(--s2)}
-.pm-event-name{font-size:12px;font-weight:500}
-.pm-event-amt{font-size:12px;font-weight:600}
-.pm-add-btn{background:none;border:.5px dashed var(--border2);border-radius:8px;
-  padding:6px;width:100%;font-size:12px;color:var(--muted);cursor:pointer;margin-top:6px;
-  text-align:center}
-.pm-status{position:absolute;top:13px;right:13px;width:8px;height:8px;
-  border-radius:50%;flex-shrink:0}
-
 /* EVENT FORM (modal-like) */
 .ev-form{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
   padding:13px;margin-bottom:8px;display:none}
@@ -883,20 +863,39 @@ function projectBase(saldoStart, rispMese){
 function projectPiano(opts){
   opts=opts||{};
   var now=new Date();
+  var miCorrente=now.getMonth();
+  var annoCorrente=now.getFullYear();
   var media=mediaRisp();
   var rispBase=opts.risp!==undefined?opts.risp:(media!==null?media:(S.stipendio-S.spese));
   var saldoOggi=opts.saldo!==undefined?opts.saldo:S.saldo;
-  var saldoFine=opts.saldoFine!==undefined?opts.saldoFine:calcSaldoFineMese();
-  var entrateM0=S.entrateAttese||0;
-  var usciteM0=S.speseAttese||0;
 
-  // Mese corrente (parziale, aperto)
+  // Eventi pianificati nel mese corrente
+  var pianoCorrente=null;
+  for(var k=0;k<S.piano.length;k++){
+    if(S.piano[k].mi===miCorrente&&S.piano[k].anno===annoCorrente){
+      pianoCorrente=S.piano[k]; break;
+    }
+  }
+  var evInM0=0, evOutM0=0, eventiM0=[];
+  if(pianoCorrente&&pianoCorrente.eventi){
+    pianoCorrente.eventi.forEach(function(ev){
+      if(ev.tipo==='in') evInM0+=parseFloat(ev.amt)||0;
+      else evOutM0+=parseFloat(ev.amt)||0;
+      eventiM0.push(ev);
+    });
+  }
+
+  var entrateM0=(S.entrateAttese||0)+evInM0;
+  var usciteM0=(S.speseAttese||0)+evOutM0;
+  var saldoFine=opts.saldoFine!==undefined?opts.saldoFine:(saldoOggi+entrateM0-usciteM0);
+
+  // Mese corrente (parziale, aperto, con eventi inclusi)
   var res=[{
-    mi:now.getMonth(), anno:now.getFullYear(),
+    mi:miCorrente, anno:annoCorrente,
     saldoInizio:Math.round(saldoOggi),
     entrate:Math.round(entrateM0), uscite:Math.round(usciteM0),
     sl:Math.round(saldoFine),
-    eventi:[], isCurrent:true
+    eventi:eventiM0, isCurrent:true
   }];
 
   // Mesi futuri: partono dal saldo fine mese corrente
@@ -1029,11 +1028,15 @@ function renderProssimaAzione(){
   }
 
   // Regola 3: mese critico nei prossimi 3 mesi
-  var critMese=null;
-  for(var i=0;i<3;i++){if(piano[i].sl<S.soglia){critMese=piano[i];break;}}
+  var critMese=null, critIdx=null;
+  for(var i=0;i<3;i++){if(piano[i].sl<S.soglia){critMese=piano[i];critIdx=i;break;}}
   if(critMese){
+    var msgTime;
+    if(critIdx===0) msgTime='A fine mese il saldo scende a '+fK(critMese.sl);
+    else if(critIdx===1) msgTime='Il mese prossimo ('+MI[critMese.mi]+') il saldo scende a '+fK(critMese.sl);
+    else msgTime='Tra '+(critIdx+1)+' mesi ('+MI[critMese.mi]+') il saldo scende a '+fK(critMese.sl);
     return mkAzione('warning','📅',MI[critMese.mi]+': saldo vicino alla soglia',
-      'Tra '+( i+1)+' mes'+(i===0?'e':'i')+' il saldo scende a '+fK(critMese.sl)+'. Pianifica eventuali spese.',
+      msgTime+'. Pianifica eventuali spese.',
       function(){nav('piano');setTimeout(function(){subNav('p-piano');},100);});
   }
 
@@ -1114,11 +1117,10 @@ function mkAzione(type,icon,title,sub,action){
 // ── HOME ───────────────────────────────────────────────────
 function renderHome(){
   var media=mediaRisp();
-  var rispMese=media!==null?media:(S.stipendio-S.spese);
   var netto=S.stipendio-S.spese;
   var disponibile=S.saldo-S.soglia;
   var tasso=S.stipendio>0?Math.round(netto/S.stipendio*100):0;
-  var isReal=S.storico.length>0; // abbiamo dati storici reali
+  var isReal=S.storico.length>0;
 
   // ── 3 NUMERI HERO ──
   var saldoFine=calcSaldoFineMese();
@@ -1341,6 +1343,7 @@ function renderBudget(){
 function renderTargetSaldo(){
   var card=document.getElementById('targetSaldoCard'); if(!card) return;
   var target=S.targetSaldo||0;
+  var baseSaldo=S.stipendio>0?calcSaldoFineMese():S.saldo;
   if(!target||!S.saldo){
     document.getElementById('tsLabel').textContent='Imposta un obiettivo in Setup';
     document.getElementById('tsNote').textContent='';
@@ -1350,33 +1353,71 @@ function renderTargetSaldo(){
     document.getElementById('tsTgt').textContent='—';
     return;
   }
-  var media=mediaRisp();
-  var rispMese=media!==null?media:(S.stipendio-S.spese);
-  var pct=Math.min(100,Math.round(S.saldo/target*100));
+  var pct=Math.min(100,Math.round(baseSaldo/target*100));
   document.getElementById('tsLabel').textContent='Obiettivo: '+fE(target);
-  document.getElementById('tsCur').textContent='Ora: '+fK(S.saldo);
+  document.getElementById('tsCur').textContent='Fine mese: '+fK(baseSaldo);
   document.getElementById('tsTgt').textContent='Target: '+fK(target);
   setTimeout(function(){document.getElementById('tsFill').style.width=pct+'%';},100);
-  if(rispMese<=0){
-    document.getElementById('tsNote').textContent='Aumenta il risparmio per raggiungere l\'obiettivo';
-    document.getElementById('tsEta').textContent='—';
-    document.getElementById('tsEta').style.color='var(--muted)';
-    return;
-  }
-  var mancano=target-S.saldo;
-  if(mancano<=0){
+
+  // Già raggiunto?
+  if(baseSaldo>=target){
     document.getElementById('tsNote').textContent='Obiettivo già raggiunto! 🎉';
     document.getElementById('tsEta').textContent='✓';
     document.getElementById('tsEta').style.color='var(--green)';
     return;
   }
-  var mesi=Math.ceil(mancano/rispMese);
-  var now=new Date();
-  var arrivo=new Date(now.getFullYear(),now.getMonth()+mesi,1);
-  var etaTxt=MI[arrivo.getMonth()]+' '+arrivo.getFullYear();
-  document.getElementById('tsNote').textContent='Mancano '+fK(mancano)+' · '+mesi+' mes'+(mesi===1?'e':'i');
+
+  // Cerca il mese in cui il saldo supera il target
+  // usando projectPiano (include eventi straordinari pianificati)
+  // Proietta fino a 60 mesi se serve
+  var media=mediaRisp();
+  var rispBase=media!==null?media:(S.stipendio-S.spese);
+  if(rispBase<=0){
+    document.getElementById('tsNote').textContent='Aumenta il risparmio per raggiungere l\'obiettivo';
+    document.getElementById('tsEta').textContent='—';
+    document.getElementById('tsEta').style.color='var(--muted)';
+    return;
+  }
+
+  // Proiezione estesa: usa piano per i primi 12 mesi, poi lineare
+  var piano12=projectPiano();
+  var arrivoMese=null;
+  var arrivoN=null;
+
+  // Controlla nei 12 mesi con eventi
+  for(var i=0;i<piano12.length;i++){
+    if(piano12[i].sl>=target){arrivoMese=piano12[i];arrivoN=i;break;}
+  }
+
+  // Se non trovato nei 12, continua linearmente dal saldo finale del piano
+  if(!arrivoMese){
+    var saldoBase=piano12[11].sl;
+    var mesiExtra=Math.ceil((target-saldoBase)/rispBase);
+    if(mesiExtra>0&&mesiExtra<480){
+      var now2=new Date();
+      var totMesi=12+mesiExtra;
+      var miArr=(now2.getMonth()+totMesi)%12;
+      var aaArr=now2.getFullYear()+Math.floor((now2.getMonth()+totMesi)/12);
+      arrivoN=totMesi;
+      arrivoMese={mi:miArr,anno:aaArr,sl:saldoBase+mesiExtra*rispBase};
+    }
+  }
+
+  if(!arrivoMese){
+    document.getElementById('tsNote').textContent='Non raggiungibile con il risparmio attuale';
+    document.getElementById('tsEta').textContent='—';
+    document.getElementById('tsEta').style.color='var(--red)';
+    return;
+  }
+
+  var mancano=target-baseSaldo;
+  // Verifica se gli eventi hanno impatto
+  var hasEvents=S.piano.length>0&&arrivoN<=12;
+  var noteExtra=hasEvents?' (eventi inclusi)':'';
+  document.getElementById('tsNote').textContent='Mancano '+fK(mancano)+' · '+arrivoN+' mes'+(arrivoN===1?'e':'i')+noteExtra;
+  var etaTxt=MI[arrivoMese.mi]+' '+arrivoMese.anno;
   document.getElementById('tsEta').textContent=etaTxt;
-  document.getElementById('tsEta').style.color=mesi<=12?'var(--green)':mesi<=24?'var(--amber)':'var(--red)';
+  document.getElementById('tsEta').style.color=arrivoN<=12?'var(--green)':arrivoN<=24?'var(--amber)':'var(--red)';
 }
 
 // ── TREND RISPARMIO ────────────────────────────────────────

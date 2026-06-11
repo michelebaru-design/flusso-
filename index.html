@@ -1597,7 +1597,10 @@ function doSave(){
   S.soglia=parseFloat(document.getElementById('sSog').value)||2000;
   S.targetSaldo=parseFloat(document.getElementById('sTarget').value)||0;
   sv();
-  try{localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));}catch(e){}
+  try{
+    localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));
+    localStorage.setItem(LK+'_noDemo','1'); // dati reali inseriti, non ricaricare mai il demo
+  }catch(e){}
   toast('Salvato');
   setTimeout(function(){nav('home');},500);
 }
@@ -1656,7 +1659,11 @@ function updateBackupLabel(){
 function doReset(){
   showConfirm('Reset tutti i dati','Questa azione è irreversibile. Tutto verrà cancellato.',function(){
     S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,storico:[],goals:[],piano:[]};
-    sv();try{localStorage.removeItem(LK+'_upd');}catch(e){}
+    sv();
+    try{
+      localStorage.removeItem(LK+'_upd');
+      localStorage.setItem(LK+'_noDemo','1'); // impedisce ricarica dati demo
+    }catch(e){}
     renderSetup(); toast('Reset effettuato');
   });
 }
@@ -1694,8 +1701,9 @@ function toast(msg){
   toastT=setTimeout(function(){el.classList.remove('show');},2200);
 }
 
-// DEMO
+// DEMO — solo al primissimo avvio, mai dopo un reset volontario
 function loadDemo(){
+  try{ if(localStorage.getItem(LK+'_noDemo')) return; }catch(e){}
   if(!S.stipendio&&!S.saldo){
     S.stipendio=2000;S.spese=1600;S.saldo=8200;S.soglia=3000;S.targetSaldo=15000;
     S.storico=[

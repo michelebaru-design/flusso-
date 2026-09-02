@@ -905,14 +905,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <div id="toast"></div>
 
 <script>
-// Fix iOS Safari: 100dvh a volte resta "vecchio" dopo che la toolbar si nasconde/mostra,
-// causando contenuto irraggiungibile in fondo. Calcoliamo l'altezza reale via JS.
+// Fix iOS Safari: window.innerHeight include a volte l'area coperta dalla toolbar
+// del browser (indirizzo, frecce, ecc), rendendo il fondo della pagina irraggiungibile.
+// visualViewport riporta l'altezza REALMENTE visibile, escludendo la UI di Safari.
 function setRealVh(){
-  document.documentElement.style.setProperty('--vh', (window.innerHeight*0.01)+'px');
+  var h=(window.visualViewport?window.visualViewport.height:window.innerHeight);
+  document.documentElement.style.setProperty('--vh',(h*0.01)+'px');
 }
 setRealVh();
 window.addEventListener('resize', setRealVh);
 window.addEventListener('orientationchange', function(){setTimeout(setRealVh,100);});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', setRealVh);
+  window.visualViewport.addEventListener('scroll', setRealVh);
+}
 
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 var MIF=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];

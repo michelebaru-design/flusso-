@@ -789,12 +789,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  <div style="position:sticky;bottom:0;background:var(--bg);
-    padding:12px 0 calc(var(--safe-bot) + 8px);margin-top:8px;
-    border-top:.5px solid var(--border);z-index:10">
-    <button class="pri-btn" onclick="doSave()" style="margin:0">Salva e aggiorna</button>
-  </div>
-
   <div class="stitle">Backup dati</div>
   <div class="fc">
     <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px">
@@ -806,7 +800,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <button class="pri-btn" onclick="document.getElementById('importFile').click()" style="background:var(--s2);color:var(--text);border:.5px solid var(--border2);margin-top:0">📥 Ripristina backup</button>
   </div>
 
-  <button class="sec-btn" onclick="doReset()" style="margin-bottom:30px">Reset tutti i dati</button>
+  <div style="position:sticky;bottom:0;background:var(--bg);
+    padding:12px 0 calc(var(--safe-bot) + 8px);margin-top:16px;
+    border-top:.5px solid var(--border);z-index:10">
+    <button class="pri-btn" onclick="doSave()" style="margin:0">Salva e aggiorna</button>
+  </div>
+
+  <button class="sec-btn" onclick="doReset()" style="margin-bottom:30px;margin-top:8px">Reset tutti i dati</button>
 </div>
 
 </div><!-- /scroll -->

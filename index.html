@@ -36,7 +36,7 @@ html{width:100%;height:100%;height:-webkit-fill-available}
 body{width:100%;height:100%;min-height:-webkit-fill-available;background:var(--bg);
   color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;
   overflow:hidden;overscroll-behavior:none;position:fixed;inset:0}
-#app{width:100%;height:100%;height:100dvh;display:flex;flex-direction:column;
+#app{width:100%;height:100%;height:calc(var(--vh,1vh) * 100);display:flex;flex-direction:column;
   overflow:hidden;max-width:430px;margin:0 auto}
 
 /* TOPBAR */
@@ -55,7 +55,7 @@ body{width:100%;height:100%;min-height:-webkit-fill-available;background:var(--b
 
 /* SCROLL */
 #scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-  padding:0 0 calc(var(--safe-bot) + 100px)}
+  padding:0 0 calc(var(--safe-bot) + 24px)}
 #scroll::-webkit-scrollbar{display:none}
 
 /* SCREENS */
@@ -905,6 +905,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <div id="toast"></div>
 
 <script>
+// Fix iOS Safari: 100dvh a volte resta "vecchio" dopo che la toolbar si nasconde/mostra,
+// causando contenuto irraggiungibile in fondo. Calcoliamo l'altezza reale via JS.
+function setRealVh(){
+  document.documentElement.style.setProperty('--vh', (window.innerHeight*0.01)+'px');
+}
+setRealVh();
+window.addEventListener('resize', setRealVh);
+window.addEventListener('orientationchange', function(){setTimeout(setRealVh,100);});
+
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 var MIF=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 var LK='flusso2_v2';

@@ -55,7 +55,7 @@ body{width:100%;height:100%;min-height:-webkit-fill-available;background:var(--b
 
 /* SCROLL */
 #scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-  padding:0 0 calc(var(--safe-bot) + 20px)}
+  padding:0 0 calc(var(--safe-bot) + 80px)}
 #scroll::-webkit-scrollbar{display:none}
 
 /* SCREENS */
@@ -789,7 +789,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  <button class="pri-btn" onclick="doSave()" style="margin-bottom:9px">Salva e aggiorna</button>
+  <div style="position:sticky;bottom:0;background:var(--bg);
+    padding:12px 0 calc(var(--safe-bot) + 8px);margin-top:8px;
+    border-top:.5px solid var(--border);z-index:10">
+    <button class="pri-btn" onclick="doSave()" style="margin:0">Salva e aggiorna</button>
+  </div>
 
   <div class="stitle">Backup dati</div>
   <div class="fc">
@@ -1326,20 +1330,10 @@ function renderHome(){
     var mlHC=document.getElementById('homeML'); if(mlHC) mlHC.innerHTML='';
   }
 
-  // ── STATUS ──
-
-  function setStatus(col,bg,msg){
-    dot.style.background=col;
-    bar.style.cssText='display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:12px;margin-bottom:12px;background:'+bg;
-    txt.textContent=msg; txt.style.color=col;
-  }
-  if(S.stipendio===0) setStatus('var(--faint)','var(--s2)','Nessun dato — vai in Impostazioni');
-  else if(disponibile<0||netto<0) setStatus('var(--red)','var(--rbg)','Attenzione: situazione critica');
-  else if(tasso<10||disponibile<300) setStatus('var(--amber)','var(--abg)','Margine stretto — tieni d’occhio');
-  else setStatus('var(--green)','var(--gbg)','Tutto in ordine');
-
-
-
+  // prossima azione + banners (status bar removed)
+  renderProssimaAzione();
+  renderReminder();
+  renderAnomaly(netto,media);
   renderTargetSaldo();
 }
 
@@ -1870,20 +1864,25 @@ function renderSetup(){
   updateBackupLabel();
 }
 function doSave(){
-  S.stipendio=parseFloat(document.getElementById('sSt').value)||0;
-  S.spese=parseFloat(document.getElementById('sSp').value)||0;
-  S.saldo=parseFloat(document.getElementById('sSa').value)||0;
-  S.soglia=parseFloat(document.getElementById('sSog').value)||2000;
-  S.targetSaldo=parseFloat(document.getElementById('sTarget').value)||0;
-  S.entrateAttese=parseFloat(document.getElementById('sEntrateAttese').value)||0;
-  S.speseAttese=parseFloat(document.getElementById('sSpeseAttese').value)||0;
-  sv();
   try{
-    localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));
-    localStorage.setItem(LK+'_noDemo','1');
-  }catch(e){}
-  toast('Salvato');
-  setTimeout(function(){nav('oggi');},500);
+    S.stipendio=parseFloat(document.getElementById('sSt').value)||0;
+    S.spese=parseFloat(document.getElementById('sSp').value)||0;
+    S.saldo=parseFloat(document.getElementById('sSa').value)||0;
+    S.soglia=parseFloat(document.getElementById('sSog').value)||S.spese||2000;
+    S.targetSaldo=parseFloat(document.getElementById('sTarget').value)||0;
+    S.entrateAttese=parseFloat(document.getElementById('sEntrateAttese').value)||0;
+    S.speseAttese=parseFloat(document.getElementById('sSpeseAttese').value)||0;
+    sv();
+    try{
+      localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));
+      localStorage.setItem(LK+'_noDemo','1');
+    }catch(e){}
+    toast('Salvato');
+    setTimeout(function(){nav('oggi');},500);
+  }catch(err){
+    toast('Errore: '+err.message);
+    console.error('doSave error:',err);
+  }
 }
 function exportBackup(){
   try{

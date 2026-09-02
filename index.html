@@ -561,8 +561,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  </div>
-
   <div class="card">
     <div class="card-head">
       <span class="ch-t">Proiezione saldo</span>
@@ -917,7 +915,6 @@ window.addEventListener('resize', setRealVh);
 window.addEventListener('orientationchange', function(){setTimeout(setRealVh,100);});
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', setRealVh);
-  window.visualViewport.addEventListener('scroll', setRealVh);
 }
 
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];

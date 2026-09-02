@@ -383,6 +383,100 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .hero-sub.warning{color:var(--amber);font-weight:500}
 .hero-sub.danger{color:var(--red);font-weight:500}
 
+/* ONBOARDING */
+#onboarding{position:fixed;inset:0;background:var(--bg);z-index:8000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px 48px;transition:opacity .3s}
+#onboarding.hidden{opacity:0;pointer-events:none}
+.ob-step{display:none;flex-direction:column;align-items:center;width:100%;max-width:360px}
+.ob-step.on{display:flex}
+.ob-logo{font-size:28px;font-weight:700;letter-spacing:-1px;margin-bottom:40px}
+.ob-logo sup{font-size:16px;font-weight:500}
+.ob-q{font-size:24px;font-weight:700;letter-spacing:-.5px;text-align:center;
+  margin-bottom:8px;line-height:1.2}
+.ob-hint{font-size:14px;color:var(--muted);text-align:center;margin-bottom:32px;line-height:1.5}
+.ob-input{width:100%;font-size:32px;font-weight:700;text-align:center;
+  background:var(--s2);border:.5px solid var(--border2);border-radius:16px;
+  padding:18px 16px;color:var(--text);letter-spacing:-.5px;margin-bottom:12px;
+  -webkit-appearance:none;outline:none}
+.ob-input:focus{border-color:var(--text);background:var(--surface)}
+.ob-row{display:flex;gap:12px;width:100%;margin-bottom:12px}
+.ob-row .ob-field{flex:1;display:flex;flex-direction:column;gap:6px}
+.ob-row .ob-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.4px;text-align:center}
+.ob-row .ob-field input{width:100%;font-size:22px;font-weight:700;text-align:center;
+  background:var(--s2);border:.5px solid var(--border2);border-radius:14px;
+  padding:14px 10px;color:var(--text);-webkit-appearance:none;outline:none}
+.ob-calc{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;
+  padding:12px 16px;background:var(--s2);border-radius:12px;width:100%;line-height:1.5}
+.ob-calc strong{color:var(--text);font-weight:600}
+.ob-btn{width:100%;background:var(--text);color:var(--bg);border:none;border-radius:16px;
+  padding:17px;font-size:17px;font-weight:600;cursor:pointer;letter-spacing:-.2px;
+  font-family:-apple-system,sans-serif}
+.ob-skip{font-size:13px;color:var(--muted);margin-top:16px;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px}
+.ob-dots{display:flex;gap:6px;margin-bottom:32px}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--border2)}
+.ob-dot.on{background:var(--text);width:18px;border-radius:3px}
+
+/* SCENARIO OVERLAY */
+#scenarioOverlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:7000;
+  display:none;align-items:flex-end;justify-content:center}
+#scenarioOverlay.open{display:flex}
+#scenarioBox{background:var(--surface);border-radius:20px 20px 0 0;
+  width:100%;max-width:430px;padding:20px 20px calc(var(--safe-bot)+20px);
+  max-height:85vh;overflow-y:auto}
+.sc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.sc-title{font-size:17px;font-weight:700}
+.sc-close{background:var(--s3);border:none;border-radius:50%;width:28px;height:28px;
+  font-size:14px;cursor:pointer;color:var(--muted);display:flex;align-items:center;
+  justify-content:center}
+
+/* PIANO ROW COMPACT */
+.piano-row{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
+  margin-bottom:6px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.piano-row.current{border-left:3px solid var(--blue)}
+.piano-row.ok{border-left:3px solid var(--green)}
+.piano-row.warn{border-left:3px solid var(--amber)}
+.piano-row.danger{border-left:3px solid var(--red)}
+.pr-compact{display:flex;align-items:center;justify-content:space-between;padding:12px 13px}
+.pr-compact-left{display:flex;flex-direction:column;gap:2px}
+.pr-compact-month{font-size:14px;font-weight:600}
+.pr-compact-sub{font-size:11px;color:var(--muted)}
+.pr-compact-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.pr-compact-saldo{font-size:17px;font-weight:700;letter-spacing:-.4px}
+.pr-compact-tag{font-size:9px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 6px;border-radius:4px}
+.pr-detail{display:none;padding:0 13px 12px;border-top:.5px solid var(--border)}
+.pr-detail.open{display:block}
+.pr-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:10px}
+.pr-cell{display:flex;flex-direction:column;gap:1px}
+.pr-cell-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.4px}
+.pr-cell-val{font-size:13px;font-weight:600;letter-spacing:-.3px}
+.pr-events{margin-top:8px;display:flex;flex-direction:column;gap:3px}
+.pr-event{display:flex;align-items:center;justify-content:space-between;
+  padding:5px 8px;border-radius:7px;background:var(--s2)}
+.pr-event-name{font-size:11px;font-weight:500}
+.pr-event-amt{font-size:11px;font-weight:600}
+.pr-soglia-alert{margin-top:6px;padding:6px 8px;border-radius:8px;font-size:11px;font-weight:500}
+.pr-add{width:100%;background:none;border:.5px dashed var(--border2);border-radius:8px;
+  padding:6px;font-size:11px;color:var(--muted);cursor:pointer;margin-top:8px;text-align:center}
+
+/* HOME HERO SEMPLICE */
+.hero-simple{padding:24px 0 20px;border-bottom:.5px solid var(--border);margin-bottom:14px}
+.hero-simple-label{font-size:12px;font-weight:500;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.hero-simple-num{font-size:56px;font-weight:800;letter-spacing:-2px;line-height:1}
+.hero-simple-frase{font-size:16px;font-weight:500;margin-top:8px;line-height:1.3}
+.hero-mini-row{display:flex;gap:0;margin-bottom:14px;border-radius:12px;
+  overflow:hidden;border:.5px solid var(--border)}
+.hero-mini-item{flex:1;padding:10px 8px;text-align:center;background:var(--surface)}
+.hero-mini-item:not(:last-child){border-right:.5px solid var(--border)}
+.hero-mini-label{font-size:9px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.4px}
+.hero-mini-val{font-size:16px;font-weight:700;letter-spacing:-.4px;margin-top:2px}
+
 /* TOAST */
 #toast{position:fixed;bottom:calc(var(--safe-bot) + 18px);left:50%;
   transform:translateX(-50%) translateY(10px);background:var(--text);color:var(--bg);
@@ -401,10 +495,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="tb-row">
     <div class="wordmark">Flusso<sup>2</sup></div>
     <div class="seg">
-      <button class="seg-btn on"  onclick="nav('oggi')">Oggi</button>
-      <button class="seg-btn"     onclick="nav('piano')">Piano</button>
-      <button class="seg-btn"     onclick="nav('obiettivi')">Obiettivi</button>
-      <button class="seg-btn"     onclick="nav('impostazioni')">Setup</button>
+      <button class="seg-btn on" onclick="nav('oggi')">Oggi</button>
+      <button class="seg-btn"    onclick="nav('piano')">Piano</button>
+      <button class="seg-btn"    onclick="nav('impostazioni')">Setup</button>
     </div>
   </div>
 </div>
@@ -414,28 +507,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <!-- ═══ OGGI ════════════════════════════════════════════════ -->
 <div class="screen on" id="s-oggi">
 
-  <!-- 3 NUMERI CHIAVE -->
-  <div class="hero3">
-    <div class="h3-item">
-      <div class="h3-label">Oggi</div>
-      <div class="h3-val" id="h3Oggi">—</div>
-      <div class="h3-note">saldo reale</div>
-    </div>
-    <div class="h3-item">
-      <div class="h3-label">Fine mese</div>
-      <div class="h3-val" id="h3FineMese">—</div>
-      <div class="h3-note" id="h3FineNote">previsto</div>
-    </div>
-    <div class="h3-item">
-      <div class="h3-label">12 mesi</div>
-      <div class="h3-val" id="h3Dodici">—</div>
-      <div class="h3-note" id="h3DodiciBadge">proiezione</div>
-    </div>
+  <!-- HERO SEMPLICE -->
+  <div class="hero-simple">
+    <div class="hero-simple-label" id="heroLabel">Margine disponibile</div>
+    <div class="hero-simple-num" id="heroNum">—</div>
+    <div class="hero-simple-frase" id="heroFrase">Configura i dati per iniziare</div>
   </div>
 
-  <div class="status" id="statusBar">
-    <div class="s-dot" id="sDot"></div>
-    <div class="s-txt" id="sTxt">Nessun dato inserito</div>
+  <!-- MINI ROW -->
+  <div class="hero-mini-row">
+    <div class="hero-mini-item">
+      <div class="hero-mini-label">Oggi</div>
+      <div class="hero-mini-val" id="h3Oggi">—</div>
+    </div>
+    <div class="hero-mini-item">
+      <div class="hero-mini-label">Fine mese</div>
+      <div class="hero-mini-val" id="h3FineMese">—</div>
+    </div>
+    <div class="hero-mini-item">
+      <div class="hero-mini-label">12 mesi</div>
+      <div class="hero-mini-val" id="h3Dodici">—</div>
+    </div>
   </div>
 
   <!-- PROSSIMA AZIONE -->
@@ -443,23 +535,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
   <div id="reminderBanner"></div>
   <div id="anomalyBanner"></div>
-
-  <!-- BUDGET DEL MESE -->
-  <div class="budget-card" id="budgetCard" style="display:none">
-    <div class="bg-head">
-      <div>
-        <div class="bg-label">Budget del mese</div>
-        <div class="bg-sub" id="bgSub">—</div>
-      </div>
-      <div class="bg-pct" id="bgPct">—</div>
-    </div>
-    <div class="bg-track">
-      <div class="bg-fill" id="bgFill" style="width:0%"></div>
-    </div>
-    <div class="bg-foot">
-      <span id="bgPrevSpese">—</span>
-    </div>
-  </div>
 
   <div class="kgrid">
     <div class="kpi">
@@ -486,23 +561,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  <div class="soglia-card">
-    <div class="soglia-top">
-      <div>
-        <div class="soglia-lbl">Margine disponibile</div>
-        <div class="soglia-lbl" id="sogliaNote" style="font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;margin-top:2px">—</div>
-      </div>
-      <div class="soglia-disp" id="sogliaDisp">—</div>
-    </div>
-    <div class="soglia-track">
-      <div class="soglia-fill" id="sogliaFill" style="width:0%"></div>
-      <div class="soglia-pin" id="sogliaPin" style="left:60%"></div>
-    </div>
-    <div class="soglia-foot">
-      <span>€0</span>
-      <span id="sogliaMid">Soglia</span>
-      <span id="sogliaTot">—</span>
-    </div>
   </div>
 
   <div class="card">
@@ -540,14 +598,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  <!-- TREND RISPARMIO -->
-  <div class="stitle">Andamento risparmio</div>
-  <div class="card" id="trendCard">
-    <div class="card-body" style="padding-bottom:8px">
-      <svg class="chart-svg" id="trendChart" height="70" viewBox="0 0 340 70"></svg>
-      <div id="trendRow" class="trend-row"></div>
-    </div>
-  </div>
 </div>
 
 <!-- ═══ PIANO ════════════════════════════════════════════════ -->
@@ -555,7 +605,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="sub-nav">
     <button class="snav-btn on" onclick="subNav('p-piano')">Piano 12m</button>
     <button class="snav-btn" onclick="subNav('p-storico')">Storico</button>
-    <button class="snav-btn" onclick="subNav('p-simula')">Simula</button>
   </div>
 
   <!-- SUB: PIANIFICA -->
@@ -564,21 +613,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="stitle" style="margin-top:4px">Mesi passati</div>
   <div class="card" id="storicoCard">
     <div class="card-body" style="padding:2px 13px 10px" id="storicoList"></div>
-  </div>
-
-  <!-- ENTRATE VS USCITE -->
-  <div id="dualChartSection" style="display:none">
-    <div class="stitle">Entrate vs Uscite</div>
-    <div class="card">
-      <div class="card-body" style="padding:13px">
-        <div class="dual-row" id="dualBars"></div>
-        <div class="dual-lbls" id="dualLabels"></div>
-        <div style="display:flex;gap:14px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)">
-          <div class="leg"><div class="leg-l" style="background:var(--green);width:10px;height:10px;border-radius:2px"></div>Stipendio</div>
-          <div class="leg"><div class="leg-l" style="background:var(--red);width:10px;height:10px;border-radius:2px"></div>Spese</div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- EVOLUZIONE SALDO -->
@@ -639,8 +673,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="sub-page on" id="sp-piano">
     <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 12px">
       <div class="stitle" style="margin:0">Prossimi 12 mesi</div>
-      <div style="font-size:11px;color:var(--muted)" id="pianoBase"></div>
+      <button onclick="openScenario()" style="font-size:12px;font-weight:600;color:var(--text);
+        background:var(--s2);border:.5px solid var(--border2);border-radius:9px;
+        padding:5px 11px;cursor:pointer">⚡ Prova scenario</button>
     </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="pianoBase"></div>
     <div class="card" id="pianoChartCard">
       <div class="card-body" style="padding:13px 13px 8px">
         <svg class="chart-svg" id="pianoChart" height="104" viewBox="0 0 340 104"></svg>
@@ -675,49 +712,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div><!-- /sp-piano -->
 
-  <!-- SUB: SIMULA -->
-  <div class="sub-page" id="sp-simula">
-    <div class="stitle" style="margin-top:12px">Posso permettermi…</div>
-    <div class="sl-card">
-      <div class="sl-h"><span class="sl-l">Acquisto una tantum</span><span class="sl-v" id="sv1">€0</span></div>
-      <input type="range" min="0" max="20000" step="100" value="0" id="sl1" oninput="simUpd()">
-    </div>
-    <div class="sl-card">
-      <div class="sl-h"><span class="sl-l">Nuova spesa mensile</span><span class="sl-v" id="sv2">€0</span></div>
-      <input type="range" min="0" max="2000" step="10" value="0" id="sl2" oninput="simUpd()">
-    </div>
-    <div class="sim-ans" id="simAns"></div>
-    <div class="cmp-card">
-      <div class="card-head" style="padding:9px 0;border:none"><span class="ch-t">Base vs scenario</span></div>
-      <svg class="chart-svg" id="simChart" height="88" viewBox="0 0 340 88"></svg>
-      <div class="ml" id="simML"></div>
-      <div class="legend">
-        <div class="leg"><div class="leg-l" style="background:var(--text)"></div>Base</div>
-        <div class="leg"><div class="leg-l" style="border-top:2px dashed var(--red);height:0;border-radius:0"></div>Scenario</div>
-      </div>
-    </div>
-  </div><!-- /sp-simula -->
+
 
 </div><!-- /s-piano -->
-<!-- ═══ OBIETTIVI ══════════════════════════════════════════════ -->
-<div class="screen" id="s-obiettivi">
-  <div class="stitle" style="margin-top:4px">Obiettivi</div>
-  <div id="goalsList"></div>
-  <div class="divider"></div>
-  <div class="stitle">Nuovo obiettivo</div>
-  <div class="fc">
-    <div class="frow">
-      <div class="field"><label>Nome</label><input type="text" id="gN" placeholder="Vacanze" maxlength="20"></div>
-      <div class="field"><label>Target €</label><input type="number" id="gT" placeholder="3000" inputmode="decimal"></div>
-    </div>
-    <div class="frow">
-      <div class="field"><label>Già risparmiato €</label><input type="number" id="gC" placeholder="0" inputmode="decimal"></div>
-      <div class="field"><label>Mensile dedicato €</label><input type="number" id="gM" placeholder="200" inputmode="decimal"></div>
-    </div>
-    <button class="pri-btn" onclick="addGoal()">Aggiungi obiettivo</button>
-  </div>
-</div>
-
 <!-- ═══ IMPOSTAZIONI ══════════════════════════════════════════════ -->
 <div class="screen" id="s-impostazioni">
   <div class="stitle" style="margin-top:4px">Mese corrente</div>
@@ -759,7 +756,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
         <input type="number" id="sSt" placeholder="2000" inputmode="decimal">
       </div>
       <div class="field"><label>Spese mensili previste €</label>
-        <input type="number" id="sSp" placeholder="1600" inputmode="decimal">
+        <input type="number" id="sSp" placeholder="1600" inputmode="decimal" oninput="aggiornaSoglia()">
       </div>
     </div>
     <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px">
@@ -767,15 +764,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     </div>
   </div>
 
-  <div class="stitle">Soglia intoccabile</div>
+  <div class="stitle">Soglia intoccabile <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(avanzato)</span></div>
   <div class="fc">
     <div class="frow full">
-      <div class="field"><label>Minimo bancario €</label>
-        <input type="number" id="sSog" placeholder="2000" inputmode="decimal">
+      <div class="field">
+        <label>Minimo bancario €
+          <span style="font-size:10px;color:var(--muted);font-weight:400"> · auto = 1 mese spese</span>
+        </label>
+        <input type="number" id="sSog" placeholder="1600" inputmode="decimal"
+          oninput="this.dataset.manual='1'">
       </div>
     </div>
     <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px">
-      Il saldo che non vuoi mai toccare. L'app mostra sempre quanto hai <em>sopra</em> questa cifra.
+      Quanto non vuoi mai toccare. Di default = 1 mese di spese. Cambialo solo se sai già cosa vuoi.
     </div>
   </div>
 
@@ -805,6 +806,87 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 </div>
 
 </div><!-- /scroll -->
+
+<!-- ═══ ONBOARDING ════════════════════════════════════════════════ -->
+<div id="onboarding">
+  <div class="ob-dots">
+    <div class="ob-dot on" id="od1"></div>
+    <div class="ob-dot" id="od2"></div>
+    <div class="ob-dot" id="od3"></div>
+  </div>
+
+  <!-- Step 1: saldo -->
+  <div class="ob-step on" id="obs1">
+    <div class="ob-logo">Flusso<sup>2</sup></div>
+    <div class="ob-q">Quanto hai in banca adesso?</div>
+    <div class="ob-hint">Apri l'app della tua banca e inserisci il saldo di oggi.</div>
+    <input class="ob-input" id="ob_saldo" type="number" placeholder="6.700"
+      inputmode="decimal" oninput="obCalc()">
+    <button class="ob-btn" onclick="obNext(2)">Continua →</button>
+    <div class="ob-skip" onclick="obSkip()">Salta, configura dopo</div>
+  </div>
+
+  <!-- Step 2: stipendio + spese -->
+  <div class="ob-step" id="obs2">
+    <div class="ob-logo">Flusso<sup>2</sup></div>
+    <div class="ob-q">Come sono i tuoi flussi mensili?</div>
+    <div class="ob-hint">Entrate e uscite tipiche in un mese normale.</div>
+    <div class="ob-row">
+      <div class="ob-field">
+        <label>Stipendio €</label>
+        <input id="ob_stip" type="number" placeholder="2.000"
+          inputmode="decimal" oninput="obCalc()">
+      </div>
+      <div class="ob-field">
+        <label>Spese €</label>
+        <input id="ob_spese" type="number" placeholder="1.600"
+          inputmode="decimal" oninput="obCalc()">
+      </div>
+    </div>
+    <div class="ob-calc" id="ob_calc">Inserisci i valori per vedere il calcolo</div>
+    <button class="ob-btn" onclick="obNext(3)">Continua →</button>
+  </div>
+
+  <!-- Step 3: conferma -->
+  <div class="ob-step" id="obs3">
+    <div class="ob-logo">Flusso<sup>2</sup></div>
+    <div class="ob-q">Tutto pronto.</div>
+    <div class="ob-hint">Ho impostato una soglia di sicurezza automatica pari a un mese di spese. Potrai cambiarla in qualsiasi momento.</div>
+    <div class="ob-calc" id="ob_riepilogo"></div>
+    <button class="ob-btn" onclick="obFinish()">Inizia →</button>
+  </div>
+</div>
+
+<!-- ═══ SCENARIO OVERLAY ═══════════════════════════════════════════ -->
+<div id="scenarioOverlay">
+  <div id="scenarioBox">
+    <div class="sc-head">
+      <div class="sc-title">Prova uno scenario</div>
+      <button class="sc-close" onclick="closeScenario()">✕</button>
+    </div>
+    <div class="sl-card">
+      <div class="sl-h"><span class="sl-l">Acquisto una tantum</span>
+        <span class="sl-v" id="sv1">€0</span></div>
+      <input type="range" min="0" max="20000" step="100" value="0"
+        id="sl1" oninput="simUpd()">
+    </div>
+    <div class="sl-card">
+      <div class="sl-h"><span class="sl-l">Nuova spesa mensile</span>
+        <span class="sl-v" id="sv2">€0</span></div>
+      <input type="range" min="0" max="2000" step="10" value="0"
+        id="sl2" oninput="simUpd()">
+    </div>
+    <div id="simAns"></div>
+    <div class="cmp-card" style="margin-top:8px">
+      <svg class="chart-svg" id="simChart" height="88" viewBox="0 0 340 88"></svg>
+      <div class="ml" id="simML"></div>
+      <div class="legend">
+        <div class="leg"><div class="leg-l" style="background:var(--text)"></div>Base</div>
+        <div class="leg"><div class="leg-l" style="border-top:2px dashed var(--red);height:0;border-radius:0"></div>Scenario</div>
+      </div>
+    </div>
+  </div>
+</div>
 </div><!-- /app -->
 
 <!-- CUSTOM CONFIRM DIALOG -->
@@ -824,7 +906,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 var MI=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
 var MIF=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 var LK='flusso2_v2';
-var TABS=['oggi','piano','obiettivi','impostazioni'];
+var TABS=['oggi','piano','impostazioni'];
 
 var S={
   stipendio:0, spese:0, saldo:0, soglia:2000, targetSaldo:0,
@@ -981,24 +1063,31 @@ function nav(id){
   document.querySelectorAll('.seg-btn').forEach(function(b,i){b.classList.toggle('on',TABS[i]===id);});
   var pg=document.getElementById('s-'+id); if(pg) pg.classList.add('on');
   document.getElementById('scroll').scrollTop=0;
-  if(id==='oggi')        {renderHome();}
-  if(id==='piano')       {subNav('p-piano');}
-  if(id==='obiettivi')   {renderGoals();}
-  if(id==='impostazioni'){renderSetup();}
+  if(id==='oggi')        renderHome();
+  if(id==='piano')       subNav('p-piano');
+  if(id==='impostazioni')renderSetup();
 }
 
 function subNav(subId){
   document.querySelectorAll('.sub-page').forEach(function(s){s.classList.remove('on');});
   document.querySelectorAll('.snav-btn').forEach(function(b,i){
-    b.classList.toggle('on',['p-piano','p-storico','p-simula'][i]===subId);
+    b.classList.toggle('on',['p-piano','p-storico'][i]===subId);
   });
-  // p-piano -> sp-piano (pianifica 12m), p-storico -> sp-pianifica (storico), p-simula -> sp-simula
-  var subIdMap={'p-piano':'sp-piano','p-storico':'sp-pianifica','p-simula':'sp-simula'};
+  var subIdMap={'p-piano':'sp-piano','p-storico':'sp-pianifica'};
   var pg=document.getElementById(subIdMap[subId]);
   if(pg) pg.classList.add('on');
   if(subId==='p-storico') renderStorico();
   if(subId==='p-piano')   renderPiano();
-  if(subId==='p-simula')  simUpd();
+}
+
+function openScenario(){
+  var o=document.getElementById('scenarioOverlay');
+  if(o){o.classList.add('open');}
+  simUpd();
+}
+function closeScenario(){
+  var o=document.getElementById('scenarioOverlay');
+  if(o) o.classList.remove('open');
 }
 
 // ── PROSSIMA AZIONE ────────────────────────────────────────
@@ -1081,7 +1170,7 @@ function renderProssimaAzione(){
   if(goalLento){
     return mkAzione('info','🎯','Obiettivo "'+goalLento.name+'" è lento',
       'Al ritmo attuale ci vorranno molti mesi. Valuta di dedicare di più.',
-      function(){nav('obiettivi');});
+      function(){nav('oggi');});
   }
 
   // Regola 7: tutto ok
@@ -1122,37 +1211,52 @@ function renderHome(){
   var tasso=S.stipendio>0?Math.round(netto/S.stipendio*100):0;
   var isReal=S.storico.length>0;
 
-  // ── 3 NUMERI HERO ──
+  // ── HERO SEMPLIFICATO ──
   var saldoFine=calcSaldoFineMese();
   var proj12=projectPiano();
   var saldo12=proj12[11].sl;
 
+  // Hero: UN numero + UNA frase
+  var heroNum=document.getElementById('heroNum');
+  var heroFrase=document.getElementById('heroFrase');
+  var heroLabel=document.getElementById('heroLabel');
+  if(S.stipendio>0){
+    var col,frase;
+    if(disponibile<0){
+      col='var(--red)';
+      frase='Sei '+fE(Math.abs(disponibile))+' sotto la soglia minima';
+      if(heroLabel) heroLabel.textContent='Sotto la soglia';
+    } else if(netto<0){
+      col='var(--amber)';
+      frase='Spendi più di quello che guadagni questo mese';
+      if(heroLabel) heroLabel.textContent='Margine disponibile';
+    } else {
+      col='var(--green)';
+      frase=tasso>=20?'Ottimo — risparmi '+fPct(tasso)+' dello stipendio':
+            tasso>=10?'Nella norma — prova ad arrivare al 20%':
+                      'Margine stretto — tieni d’occhio le spese';
+      if(heroLabel) heroLabel.textContent='Margine disponibile';
+    }
+    if(heroNum){heroNum.textContent=fE(disponibile);heroNum.style.color=col;}
+    if(heroFrase){heroFrase.textContent=frase;heroFrase.style.color=col;}
+  } else {
+    if(heroNum){heroNum.textContent='—';heroNum.style.color='var(--muted)';}
+    if(heroFrase){heroFrase.textContent='Tocca Setup per iniziare';heroFrase.style.color='var(--muted)';}
+    if(heroLabel) heroLabel.textContent='Benvenuto';
+  }
+
+  // Mini row: 3 numeri
   var h3o=document.getElementById('h3Oggi');
   var h3f=document.getElementById('h3FineMese');
   var h3d=document.getElementById('h3Dodici');
-  var h3fn=document.getElementById('h3FineNote');
-  var h3db=document.getElementById('h3DodiciBadge');
-
-  if(h3o) {h3o.textContent=S.saldo>0?fK(S.saldo):'—'; h3o.style.color='var(--text)';}
+  if(h3o) h3o.textContent=S.saldo>0?fK(S.saldo):'—';
   if(h3f){
     h3f.textContent=S.stipendio>0?fK(saldoFine):'—';
-    h3f.style.color=saldoFine>=S.soglia?'var(--green)':saldoFine>=0?'var(--amber)':'var(--red)';
+    h3f.style.color=S.stipendio>0?(saldoFine>=S.soglia?'var(--green)':'var(--amber)'):'var(--muted)';
   }
-  if(h3fn) h3fn.textContent=S.stipendio>0?'previsto fine '+MI[new Date().getMonth()]:'—';
   if(h3d){
     h3d.textContent=S.stipendio>0?fK(saldo12):'—';
     h3d.style.color=saldo12>=0?'var(--text)':'var(--red)';
-  }
-  if(h3db) h3db.innerHTML=S.storico.length>0?
-    '<span class="badge-dato badge-reale">● reale</span>':
-    '<span class="badge-dato badge-stima">○ stima</span>';
-
-  // ── SOGLIA ─ testo interpretivo ──
-  if(S.stipendio>0){
-    var sogliaNote=document.getElementById('sogliaNote');
-    if(sogliaNote) sogliaNote.textContent=disponibile>=0?
-      'Soglia minima \u20ac'+Math.round(S.soglia).toLocaleString('it-IT')+' — puoi spendere fino a \u20ac'+Math.round(disponibile).toLocaleString('it-IT')+' extra':
-      'Sei \u20ac'+Math.round(Math.abs(disponibile)).toLocaleString('it-IT')+' sotto la soglia minima';
   }
 
   // ── KPI: linguaggio interpretivo + badge reale/stimato ──
@@ -1204,18 +1308,6 @@ function renderHome(){
   var maxB=Math.max(S.saldo,S.soglia*1.5,1);
   var fp=Math.min(100,S.saldo/maxB*100);
   var pp=Math.min(97,S.soglia/maxB*100);
-  var sf=document.getElementById('sogliaFill');
-  var spPin=document.getElementById('sogliaPin');
-  if(sf){sf.style.background=disponibile>=0?'var(--green)':'var(--red)';
-    setTimeout(function(){sf.style.width=fp+'%';},80);}
-  if(spPin) spPin.style.left=pp+'%';
-  var sd=document.getElementById('sogliaDisp');
-  sd.textContent=S.saldo>0?fS(disponibile):'—';
-  sd.style.color=disponibile>=0?'var(--green)':'var(--red)';
-  document.getElementById('sogliaNote').textContent=
-    S.saldo>0?(disponibile>=0?'Soglia minima '+fE(S.soglia)+' — stai bene':'Sotto la soglia minima di '+fE(S.soglia)):'Imposta la soglia in Impostazioni';
-  document.getElementById('sogliaMid').textContent='Soglia '+fK(S.soglia);
-  document.getElementById('sogliaTot').textContent=fK(S.saldo);
 
   // ── PROSSIMA AZIONE ──
   renderProssimaAzione();
@@ -1235,9 +1327,7 @@ function renderHome(){
   }
 
   // ── STATUS ──
-  var dot=document.getElementById('sDot');
-  var bar=document.getElementById('statusBar');
-  var txt=document.getElementById('sTxt');
+
   function setStatus(col,bg,msg){
     dot.style.background=col;
     bar.style.cssText='display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border-radius:12px;margin-bottom:12px;background:'+bg;
@@ -1245,15 +1335,12 @@ function renderHome(){
   }
   if(S.stipendio===0) setStatus('var(--faint)','var(--s2)','Nessun dato — vai in Impostazioni');
   else if(disponibile<0||netto<0) setStatus('var(--red)','var(--rbg)','Attenzione: situazione critica');
-  else if(tasso<10||disponibile<300) setStatus('var(--amber)','var(--abg)','Margine stretto — tieni d\'occhio');
+  else if(tasso<10||disponibile<300) setStatus('var(--amber)','var(--abg)','Margine stretto — tieni d’occhio');
   else setStatus('var(--green)','var(--gbg)','Tutto in ordine');
 
-  try{var u=localStorage.getItem(LK+'_upd');
-    if(u)document.getElementById('lastUpd').textContent='Aggiornato il '+u;}catch(e){}
+
 
   renderTargetSaldo();
-  renderTrend();
-  renderBudget();
 }
 
 function renderReminder(){
@@ -1307,37 +1394,7 @@ function renderAnomaly(netto,media){
 }
 
 // ── BUDGET DEL MESE ────────────────────────────────────────
-function renderBudget(){
-  var card=document.getElementById('budgetCard'); if(!card) return;
-  if(!S.spese||S.spese<=0||!S.stipendio){card.style.display='none';return;}
-  card.style.display='block';
-  var mediaSpese=null;
-  if(S.storico.length>0){
-    mediaSpese=S.storico.reduce(function(a,m){return a+m.spese;},0)/S.storico.length;
-  }
-  var pctBudget=Math.round(S.spese/S.stipendio*100);
-  document.getElementById('bgPct').textContent=pctBudget+'%';
-  document.getElementById('bgSub').textContent='Spese '+fE(S.spese)+' su stipendio '+fE(S.stipendio);
-  var fillCol,pctCol;
-  if(pctBudget>=75){fillCol='var(--red)';pctCol='var(--red)';}
-  else if(pctBudget>=60){fillCol='var(--amber)';pctCol='var(--amber)';}
-  else{fillCol='var(--green)';pctCol='var(--green)';}
-  document.getElementById('bgPct').style.color=pctCol;
-  var msg;
-  if(mediaSpese!==null){
-    var diff=S.spese-mediaSpese;
-    if(Math.abs(diff)<mediaSpese*0.05) msg='In linea con la tua media storica';
-    else if(diff>0) msg='Budget '+fK(diff)+' sopra la media storica';
-    else msg='Budget '+fK(Math.abs(diff))+' sotto la media storica';
-  } else {
-    msg='Aggiungi storico per confronti con la media';
-  }
-  document.getElementById('bgPrevSpese').textContent=msg;
-  setTimeout(function(){
-    document.getElementById('bgFill').style.width=Math.min(100,pctBudget)+'%';
-    document.getElementById('bgFill').style.background=fillCol;
-  },100);
-}
+function renderBudget(){ /* removed */ }
 
 // ── OBIETTIVO SALDO ────────────────────────────────────────
 function renderTargetSaldo(){
@@ -1421,63 +1478,7 @@ function renderTargetSaldo(){
 }
 
 // ── TREND RISPARMIO ────────────────────────────────────────
-function renderTrend(){
-  var tc=document.getElementById('trendCard');
-  var tr=document.getElementById('trendRow');
-  if(!tc||!tr) return;
-  if(S.storico.length<2){
-    document.getElementById('trendChart').innerHTML='';
-    tr.innerHTML='<span style="font-size:12px;color:var(--muted)">Aggiungi almeno 2 mesi nello Storico per vedere il trend</span>';
-    return;
-  }
-  var data=S.storico.map(function(m){return {mi:m.mi,sl:m.stip-m.spese};});
-  var W=340,H=70,px=6,py=6;
-  var vals=data.map(function(d){return d.sl;});
-  var mn=Math.min.apply(null,vals);var mx=Math.max.apply(null,vals);
-  var rng=mx-mn||1;
-  function sx(i){return px+i*(W-px*2)/(data.length-1);}
-  function sy(v){return H-py-((v-mn)/rng)*(H-py*2);}
-  var svg=document.getElementById('trendChart');
-  svg.innerHTML='';
-  // zero line
-  if(mn<0&&mx>0){
-    svg.appendChild(svgEl('line',{x1:0,y1:sy(0).toFixed(1),x2:W,y2:sy(0).toFixed(1),
-      stroke:'var(--border2)','stroke-width':'1','stroke-dasharray':'3 2'}));
-  }
-  // area
-  var defs=svgEl('defs',{});
-  var g=svgEl('linearGradient',{id:'gTrend',x1:'0',y1:'0',x2:'0',y2:'1'});
-  g.appendChild(svgEl('stop',{'offset':'0%','stop-color':'var(--text)','stop-opacity':'.1'}));
-  g.appendChild(svgEl('stop',{'offset':'100%','stop-color':'var(--text)','stop-opacity':'0'}));
-  defs.appendChild(g); svg.appendChild(defs);
-  var pts=data.map(function(d,i){return sx(i).toFixed(1)+','+sy(d.sl).toFixed(1);}).join(' L');
-  svg.appendChild(svgEl('path',{d:'M'+pts+' L'+sx(data.length-1).toFixed(1)+','+H+' L'+sx(0).toFixed(1)+','+H+' Z',fill:'url(#gTrend)'}));
-  // dots
-  data.forEach(function(d,i){
-    var col=d.sl>=0?'var(--green)':'var(--red)';
-    svg.appendChild(svgEl('circle',{cx:sx(i).toFixed(1),cy:sy(d.sl).toFixed(1),r:'4',fill:col,stroke:'var(--surface)','stroke-width':'1.5'}));
-  });
-  // line
-  var lp=svgEl('path',{d:'M'+pts,fill:'none',stroke:'var(--text)','stroke-width':'1.8','stroke-linecap':'round','stroke-linejoin':'round'});
-  var len=W*1.3; lp.style.strokeDasharray=len; lp.style.strokeDashoffset=len;
-  lp.style.transition='stroke-dashoffset .9s cubic-bezier(.22,1,.36,1)';
-  svg.appendChild(lp);
-  requestAnimationFrame(function(){requestAnimationFrame(function(){lp.style.strokeDashoffset='0';});});
-  // trend row
-  // trend: confronta prima metà vs seconda metà dei mesi disponibili
-  var n=data.length;
-  var meta=Math.max(1,Math.floor(n/2));
-  var primaMedia=data.slice(0,meta).reduce(function(a,b){return a+b.sl;},0)/meta;
-  var ultimaMedia=data.slice(-meta).reduce(function(a,b){return a+b.sl;},0)/meta;
-  var tendenza=ultimaMedia-primaMedia;
-  var arrowUp=tendenza>=0;
-  var col=arrowUp?'var(--green)':'var(--red)';
-  var arrow=arrowUp?'▲':'▼';
-  var testo=arrowUp?'In miglioramento':'In peggioramento';
-  tr.innerHTML='<div class="trend-arrow" style="color:'+col+'">'+arrow+'</div>'
-    +'<div class="trend-label" style="color:'+col+'">'+testo+' negli ultimi '+S.storico.length+' mesi</div>'
-    +'<div class="trend-val" style="color:'+col+'">'+(arrowUp?'+':'')+fS(Math.round(tendenza))+'/mese</div>';
-}
+function renderTrend(){ /* removed */ }
 
 // ── RIEPILOGO ANNO ─────────────────────────────────────────
 function renderRiepilogo(){
@@ -1507,110 +1508,10 @@ function renderRiepilogo(){
 }
 
 // ── ENTRATE VS USCITE BAR CHART ────────────────────────────
-function renderDualChart(){
-  var section=document.getElementById('dualChartSection');
-  var barsEl=document.getElementById('dualBars');
-  var lblsEl=document.getElementById('dualLabels');
-  if(!section||!barsEl||!lblsEl) return;
-  if(S.storico.length<2){section.style.display='none';return;}
-  section.style.display='block';
-  // limita a ultimi 12 mesi
-  var data=S.storico.slice(-12);
-  var maxVal=Math.max.apply(null,data.map(function(m){return Math.max(m.stip,m.spese);}));
-  maxVal=maxVal||1;
-  barsEl.innerHTML='';
-  lblsEl.innerHTML='';
-  data.forEach(function(m,i){
-    var hStip=Math.round(m.stip/maxVal*86);
-    var hSpese=Math.round(m.spese/maxVal*86);
-    var g=document.createElement('div'); g.className='dual-group';
-    g.innerHTML='<div class="dual-bar in" id="db_in_'+i+'" style="height:0px"></div>'
-      +'<div class="dual-bar out" id="db_out_'+i+'" style="height:0px"></div>';
-    barsEl.appendChild(g);
-    var l=document.createElement('div'); l.className='dual-lbl';
-    l.textContent=MI[m.mi]; lblsEl.appendChild(l);
-    setTimeout((function(idx,hi,ho){return function(){
-      var bi=document.getElementById('db_in_'+idx);
-      var bo=document.getElementById('db_out_'+idx);
-      if(bi){bi.style.transition='height .7s cubic-bezier(.22,1,.36,1)';bi.style.height=hi+'px';}
-      if(bo){bo.style.transition='height .7s cubic-bezier(.22,1,.36,1) .05s';bo.style.height=ho+'px';}
-    };})(i,hStip,hSpese),i*60+100);
-  });
-}
+function renderDualChart(){ /* removed */ }
 
 // ── EVOLUZIONE SALDO BANCARIO ──────────────────────────────
-function renderSaldoEvol(){
-  var section=document.getElementById('saldoChartSection');
-  var svg=document.getElementById('saldoEvolChart');
-  var lblsEl=document.getElementById('saldoEvolLabels');
-  var trendEl=document.getElementById('saldoTrendRow');
-  if(!section||!svg||!lblsEl||!trendEl) return;
-  // filtra solo mesi con saldo inserito (NaN/null escluso, ma 0 è valido)
-  var data=S.storico.filter(function(m){return m.saldo!==null&&m.saldo!==undefined&&!isNaN(m.saldo);}).slice(-12);
-  if(data.length<2){section.style.display='none';return;}
-  section.style.display='block';
-  // disegna linea
-  svg.innerHTML='';
-  var W=340,H=100,px=8,py=10;
-  var vals=data.map(function(m){return m.saldo;});
-  var mn=Math.min.apply(null,vals);
-  var mx=Math.max.apply(null,vals);
-  var rng=mx-mn||1;
-  function sx(i){return px+i*(W-px*2)/(data.length-1);}
-  function sy(v){return H-py-((v-mn)/rng)*(H-py*2);}
-  // soglia line
-  if(S.soglia&&S.soglia>=mn&&S.soglia<=mx){
-    svg.appendChild(svgEl('line',{x1:0,y1:sy(S.soglia).toFixed(1),x2:W,y2:sy(S.soglia).toFixed(1),
-      stroke:'var(--amber)','stroke-width':'1','stroke-dasharray':'3 2',opacity:'.5'}));
-    var soglialbl=svgEl('text',{x:W-4,y:sy(S.soglia).toFixed(1)-3,'text-anchor':'end',
-      'font-size':'9','fill':'var(--amber)','font-family':'Inter'});
-    soglialbl.textContent='soglia '+fK(S.soglia);
-    svg.appendChild(soglialbl);
-  }
-  // gradient
-  var defs=svgEl('defs',{});
-  var g=svgEl('linearGradient',{id:'gSaldoEvol',x1:'0',y1:'0',x2:'0',y2:'1'});
-  g.appendChild(svgEl('stop',{'offset':'0%','stop-color':'var(--text)','stop-opacity':'.12'}));
-  g.appendChild(svgEl('stop',{'offset':'100%','stop-color':'var(--text)','stop-opacity':'0'}));
-  defs.appendChild(g); svg.appendChild(defs);
-  var pts=data.map(function(m,i){return sx(i).toFixed(1)+','+sy(m.saldo).toFixed(1);}).join(' L');
-  svg.appendChild(svgEl('path',{d:'M'+pts+' L'+sx(data.length-1).toFixed(1)+','+H+' L'+sx(0).toFixed(1)+','+H+' Z',
-    fill:'url(#gSaldoEvol)'}));
-  // dots
-  data.forEach(function(m,i){
-    var col=m.saldo>=S.soglia?'var(--green)':'var(--red)';
-    svg.appendChild(svgEl('circle',{cx:sx(i).toFixed(1),cy:sy(m.saldo).toFixed(1),r:'4',
-      fill:col,stroke:'var(--surface)','stroke-width':'1.5'}));
-  });
-  // line
-  var lp=svgEl('path',{d:'M'+pts,fill:'none',stroke:'var(--text)','stroke-width':'2',
-    'stroke-linecap':'round','stroke-linejoin':'round'});
-  var len=W*1.4; lp.style.strokeDasharray=len; lp.style.strokeDashoffset=len;
-  lp.style.transition='stroke-dashoffset 1s cubic-bezier(.22,1,.36,1) .1s';
-  svg.appendChild(lp);
-  requestAnimationFrame(function(){requestAnimationFrame(function(){lp.style.strokeDashoffset='0';});});
-  // labels
-  lblsEl.innerHTML='';
-  var steps=Math.min(5,data.length);
-  for(var i=0;i<steps;i++){
-    var idx=Math.round(i*(data.length-1)/(steps-1));
-    var s=document.createElement('span');
-    s.textContent=MI[data[idx].mi];
-    lblsEl.appendChild(s);
-  }
-  // trend
-  var primo=data[0].saldo;
-  var ultimo=data[data.length-1].saldo;
-  var delta=ultimo-primo;
-  var pctVar=primo>0?Math.round(delta/primo*100):0;
-  var arrowUp=delta>=0;
-  var col=arrowUp?'var(--green)':'var(--red)';
-  var arrow=arrowUp?'▲':'▼';
-  var msg=arrowUp?'Patrimonio in crescita':'Patrimonio in calo';
-  trendEl.innerHTML='<div class="trend-arrow" style="color:'+col+'">'+arrow+'</div>'
-    +'<div class="trend-label" style="color:'+col+'">'+msg+' su '+data.length+' mesi</div>'
-    +'<div class="trend-val" style="color:'+col+'">'+(arrowUp?'+':'')+fS(delta)+' ('+(arrowUp?'+':'')+pctVar+'%)</div>';
-}
+function renderSaldoEvol(){ /* removed */ }
 
 // ── STORICO ────────────────────────────────────────────────
 function addMese(){
@@ -1801,32 +1702,40 @@ function renderPiano(){
 
     var card=document.createElement('div');
     card.className='piano-row '+rowCls;
+    var detailId='pd_'+d.mi+'_'+d.anno;
     card.innerHTML=
-      '<div class="pr-header">'
-        +'<div class="pr-month">'+MI[d.mi]+' '+d.anno+(d.isCurrent?' <span style="font-size:11px;color:var(--blue);font-weight:400">mese aperto</span>':'')+'</div>'
-        +'<div class="pr-tag '+rowCls+'">'+tagTxt+'</div>'
-      +'</div>'
-      +'<div class="pr-grid">'
-        +'<div class="pr-cell">'
-          +'<div class="pr-cell-label">Saldo iniziale</div>'
-          +'<div class="pr-cell-val">'+fK(d.saldoInizio)+'</div>'
+      // COMPACT VIEW (always visible)
+      '<div class="pr-compact" onclick="togglePianoRow(this)">'
+        +'<div class="pr-compact-left">'
+          +'<div class="pr-compact-month">'+MI[d.mi]+(d.isCurrent?' <span style="font-size:10px;color:var(--blue)">· aperto</span>':'')+'</div>'
+          +(d.eventi&&d.eventi.length?'<div class="pr-compact-sub">'+d.eventi.length+' event'+(d.eventi.length>1?'i':'o')+'</div>':'')
         +'</div>'
-        +'<div class="pr-cell">'
-          +'<div class="pr-cell-label">'+(d.isCurrent?'Entrate attese':'Entrate')+'</div>'
-          +'<div class="pr-cell-val" style="color:var(--green)">'+fK(d.entrate)+'</div>'
-        +'</div>'
-        +'<div class="pr-cell">'
-          +'<div class="pr-cell-label">'+(d.isCurrent?'Spese attese':'Uscite')+'</div>'
-          +'<div class="pr-cell-val" style="color:var(--red)">'+fK(d.uscite)+'</div>'
-        +'</div>'
-        +'<div class="pr-cell" style="text-align:right">'
-          +'<div class="pr-cell-label">Saldo fine mese</div>'
-          +'<div class="pr-cell-val" style="color:'+col+'">'+fK(d.sl)+'</div>'
+        +'<div class="pr-compact-right">'
+          +'<div class="pr-compact-saldo" style="color:'+col+'">'+fK(d.sl)+'</div>'
+          +'<div class="pr-compact-tag '+rowCls+'" style="background:'+(rowCls==='ok'?'var(--gbg)':rowCls==='warn'?'var(--abg)':rowCls==='danger'?'var(--rbg)':'var(--bbg)')
+            +';color:'+col+'">'+tagTxt+'</div>'
         +'</div>'
       +'</div>'
-      +(evHtml?'<div class="pr-events">'+evHtml+'</div>':'')
-      +alertHtml
-      +'<button class="pr-add" onclick="openEvForm('+d.mi+','+d.anno+')">+ Aggiungi evento</button>';
+      // DETAIL VIEW (expandable)
+      +'<div class="pr-detail" id="'+detailId+'">'
+        +'<div class="pr-grid">'
+          +'<div class="pr-cell">'
+            +'<div class="pr-cell-label">Inizio</div>'
+            +'<div class="pr-cell-val">'+fK(d.saldoInizio)+'</div>'
+          +'</div>'
+          +'<div class="pr-cell">'
+            +'<div class="pr-cell-label">'+(d.isCurrent?'Entrate attese':'Entrate')+'</div>'
+            +'<div class="pr-cell-val" style="color:var(--green)">'+fK(d.entrate)+'</div>'
+          +'</div>'
+          +'<div class="pr-cell">'
+            +'<div class="pr-cell-label">'+(d.isCurrent?'Spese attese':'Uscite')+'</div>'
+            +'<div class="pr-cell-val" style="color:var(--red)">'+fK(d.uscite)+'</div>'
+          +'</div>'
+        +'</div>'
+        +(evHtml?'<div class="pr-events">'+evHtml+'</div>':'')
+        +alertHtml
+        +'<button class="pr-add" onclick="openEvForm('+d.mi+','+d.anno+')">+ Aggiungi evento</button>'
+      +'</div>';
 
     container.appendChild(card);
   });
@@ -1924,50 +1833,24 @@ function simUpd(){
 }
 
 // ── GOALS ──────────────────────────────────────────────────
-function addGoal(){
-  var n=(document.getElementById('gN').value||'').trim();
-  var t=parseFloat(document.getElementById('gT').value)||0;
-  var c=parseFloat(document.getElementById('gC').value)||0;
-  var m=parseFloat(document.getElementById('gM').value)||0;
-  if(!n||!t){toast('Inserisci nome e target');return;}
-  S.goals.push({id:Date.now(),name:n,target:t,current:c,monthly:m});
-  sv();
-  ['gN','gT','gC','gM'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
-  renderGoals(); toast('Obiettivo aggiunto');
-}
+function addGoal(){ /* removed */ }
+
 function rmGoal(id){S.goals=S.goals.filter(function(g){return g.id!==id;});sv();renderGoals();}
-function renderGoals(){
-  var c=document.getElementById('goalsList'); if(!c) return;
-  var media=mediaRisp();
-  if(!S.goals.length){c.innerHTML='<div class="empty">Nessun obiettivo.<br>Aggiungine uno qui sotto.</div>';return;}
-  c.innerHTML='';
-  S.goals.forEach(function(g){
-    var rem=Math.max(0,g.target-g.current);
-    var mensile=g.monthly>0?g.monthly:(media&&media>0?media*0.3:0);
-    var mths=mensile>0?Math.ceil(rem/mensile):null;
-    var pct=g.target>0?Math.min(100,Math.round(g.current/g.target*100)):0;
-    var ecls,etxt;
-    if(!mths){ecls='background:var(--s2);color:var(--muted)';etxt='Imposta mensile';}
-    else if(mths<=12){ecls='background:var(--gbg);color:var(--green)';etxt='tra '+mths+' mes'+(mths===1?'e':'i');}
-    else if(mths<=36){ecls='background:var(--abg);color:var(--amber)';etxt='tra '+mths+' mesi';}
-    else{ecls='background:var(--rbg);color:var(--red)';etxt='~'+Math.round(mths/12)+' anni';}
-    var note=media&&g.monthly===0?'<span style="font-size:11px;color:var(--muted)">Basato sulla media storica</span>':'';
-    var d=document.createElement('div'); d.className='goal-card';
-    d.innerHTML='<div class="goal-top">'
-      +'<div class="goal-name">'+g.name+'</div>'
-      +'<div class="eta-pill" style="'+ecls+'">'+etxt+'</div>'
-      +'</div>'
-      +'<div class="goal-track"><div class="goal-fill" id="gf_'+g.id+'" style="width:0%"></div></div>'
-      +'<div class="goal-meta"><span>'+fE(g.current)+' di '+fE(g.target)+'</span><span>'+pct+'%</span></div>'
-      +'<div class="goal-footer">'+note
-        +'<button class="fx-del" onclick="rmGoal('+g.id+')" style="font-size:13px">✕</button>'
-      +'</div>';
-    c.appendChild(d);
-    setTimeout((function(id,p){return function(){var f=document.getElementById('gf_'+id);if(f)f.style.width=p+'%';};})(g.id,pct),120);
-  });
+function togglePianoRow(compactEl){
+  var detail=compactEl.parentElement.querySelector('.pr-detail');
+  if(detail) detail.classList.toggle('open');
 }
 
+function renderGoals(){ /* removed */ }
+
 // ── SETUP ──────────────────────────────────────────────────
+function aggiornaSoglia(){
+  // Soglia automatica = 1 mese di spese (se non modificata manualmente)
+  var sp=parseFloat(document.getElementById('sSp')?document.getElementById('sSp').value:0)||0;
+  var sog=document.getElementById('sSog');
+  if(sog&&!sog.dataset.manual&&sp>0) sog.value=sp;
+}
+
 function aggiornaSaldoFineMese(){
   var sa=parseFloat(document.getElementById('sSa')?document.getElementById('sSa').value:0)||0;
   var ea=parseFloat(document.getElementById('sEntrateAttese')?document.getElementById('sEntrateAttese').value:0)||0;
@@ -2099,6 +1982,80 @@ function toast(msg){
   toastT=setTimeout(function(){el.classList.remove('show');},2200);
 }
 
+
+// ── ONBOARDING ─────────────────────────────────────────────
+function obShowStep(n){
+  [1,2,3].forEach(function(i){
+    document.getElementById('obs'+i).classList.toggle('on',i===n);
+    document.getElementById('od'+i).classList.toggle('on',i===n);
+  });
+}
+function obCalc(){
+  var stip=parseFloat(document.getElementById('ob_stip').value)||0;
+  var spese=parseFloat(document.getElementById('ob_spese').value)||0;
+  var risp=stip-spese;
+  var calc=document.getElementById('ob_calc');
+  if(calc){
+    if(stip&&spese){
+      calc.innerHTML='Risparmi <strong>'+fE(risp)+'</strong> al mese '
+        +(risp>=0?'— '+Math.round(risp/stip*100)+'% dello stipendio':'— spese maggiori delle entrate!');
+    } else {
+      calc.innerHTML='Inserisci i valori per vedere il calcolo';
+    }
+  }
+  var saldo=parseFloat(document.getElementById('ob_saldo').value)||0;
+  var rie=document.getElementById('ob_riepilogo');
+  if(rie&&saldo&&stip&&spese){
+    var soglia=spese; // auto = 1 mese di spese
+    rie.innerHTML='Saldo: <strong>'+fE(saldo)+'</strong><br>'
+      +'Stipendio: <strong>'+fE(stip)+'</strong> · Spese: <strong>'+fE(spese)+'</strong><br>'
+      +'Risparmio mese: <strong>'+fE(risp)+'</strong><br>'
+      +'Soglia automatica: <strong>'+fE(soglia)+'</strong>';
+  }
+}
+function obNext(step){
+  if(step===2){
+    var saldo=parseFloat(document.getElementById('ob_saldo').value)||0;
+    if(!saldo){toast('Inserisci il saldo bancario');return;}
+  }
+  if(step===3){
+    var stip=parseFloat(document.getElementById('ob_stip').value)||0;
+    var spese=parseFloat(document.getElementById('ob_spese').value)||0;
+    if(!stip||!spese){toast('Inserisci stipendio e spese');return;}
+    obCalc();
+  }
+  obShowStep(step);
+}
+function obFinish(){
+  var saldo=parseFloat(document.getElementById('ob_saldo').value)||0;
+  var stip=parseFloat(document.getElementById('ob_stip').value)||0;
+  var spese=parseFloat(document.getElementById('ob_spese').value)||0;
+  S.saldo=saldo; S.stipendio=stip; S.spese=spese;
+  S.soglia=spese; // auto = 1 mese di spese
+  S.entrateAttese=0; S.speseAttese=spese; // spese ancora tutte da fare
+  sv();
+  try{localStorage.setItem(LK+'_noDemo','1');
+    localStorage.setItem(LK+'_upd',new Date().toLocaleDateString('it-IT'));}catch(e){}
+  var ob=document.getElementById('onboarding');
+  if(ob){ob.style.opacity='0';setTimeout(function(){ob.style.display='none';},300);}
+  renderHome();
+}
+function obSkip(){
+  var ob=document.getElementById('onboarding');
+  if(ob){ob.style.opacity='0';setTimeout(function(){ob.style.display='none';},300);}
+}
+function checkOnboarding(){
+  // Mostra onboarding solo se non ci sono dati e non è mai stato fatto
+  if(!S.stipendio&&!S.saldo){
+    try{if(localStorage.getItem(LK+'_noDemo')) return;}catch(e){}
+    var ob=document.getElementById('onboarding');
+    if(ob) ob.style.display='flex';
+  } else {
+    var ob=document.getElementById('onboarding');
+    if(ob) ob.style.display='none';
+  }
+}
+
 // DEMO — solo al primissimo avvio, mai dopo un reset volontario
 function loadDemo(){
   try{ if(localStorage.getItem(LK+'_noDemo')) return; }catch(e){}
@@ -2125,7 +2082,7 @@ function loadDemo(){
 }
 
 // INIT
-ld(); loadDemo(); renderHome();
+ld(); loadDemo(); checkOnboarding(); renderHome();
 </script>
 </body>
 </html>

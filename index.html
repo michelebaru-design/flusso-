@@ -235,17 +235,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .dual-lbl{flex:1;text-align:center;font-size:10px;color:var(--muted)}
 
 /* GOALS */
-.goal-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
-  padding:13px;margin-bottom:8px}
-.goal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
-.goal-name{font-size:14px;font-weight:600;letter-spacing:-.2px}
-.eta-pill{font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px}
-.goal-track{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin:7px 0}
-.goal-fill{height:100%;border-radius:3px;background:var(--text);
-  transition:width 1s cubic-bezier(.22,1,.36,1)}
-.goal-meta{display:flex;justify-content:space-between}
-.goal-meta span{font-size:11px;color:var(--muted)}
-.goal-footer{display:flex;justify-content:flex-end;margin-top:9px}
 
 /* FORM */
 .fc{background:var(--surface);border-radius:14px;border:.5px solid var(--border);
@@ -925,7 +914,7 @@ var TABS=['oggi','piano','impostazioni'];
 var S={
   stipendio:0, spese:0, saldo:0, soglia:2000, targetSaldo:0,
   entrateAttese:0, speseAttese:0,
-  storico:[], goals:[], piano:[]
+  storico:[], piano:[]
 };
 
 function sv(){try{localStorage.setItem(LK,JSON.stringify(S));}catch(e){}}
@@ -1170,21 +1159,6 @@ function renderProssimaAzione(){
         'Fine mese vicina — inserisci le spese effettive per aggiornare le proiezioni.',
         function(){nav('piano');});
     }
-  }
-
-  // Regola 6: obiettivo in ritardo
-  var goalLento=null;
-  for(var g=0;g<S.goals.length;g++){
-    var gg=S.goals[g];
-    var rem=gg.target-gg.current;
-    var mens=gg.monthly>0?gg.monthly:(media&&media>0?media*0.3:0);
-    var mths=mens>0?Math.ceil(rem/mens):9999;
-    if(mths>24&&rem>0){goalLento=gg;break;}
-  }
-  if(goalLento){
-    return mkAzione('info','🎯','Obiettivo "'+goalLento.name+'" è lento',
-      'Al ritmo attuale ci vorranno molti mesi. Valuta di dedicare di più.',
-      function(){nav('oggi');});
   }
 
   // Regola 7: tutto ok
@@ -1837,15 +1811,12 @@ function simUpd(){
 }
 
 // ── GOALS ──────────────────────────────────────────────────
-function addGoal(){ /* removed */ }
 
-function rmGoal(id){S.goals=S.goals.filter(function(g){return g.id!==id;});sv();renderGoals();}
 function togglePianoRow(compactEl){
   var detail=compactEl.parentElement.querySelector('.pr-detail');
   if(detail) detail.classList.toggle('open');
 }
 
-function renderGoals(){ /* removed */ }
 
 // ── SETUP ──────────────────────────────────────────────────
 function aggiornaSoglia(){
@@ -1926,7 +1897,7 @@ function importBackup(ev){
       }
       showConfirm('Ripristinare il backup?','I dati attuali verranno sovrascritti.',function(){
         Object.assign(S,{stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,entrateAttese:0,speseAttese:0,
-          storico:[],goals:[],piano:[]},obj.state);
+          storico:[],piano:[]},obj.state);
         sv();
         renderSetup();
         toast('Backup ripristinato');
@@ -1948,7 +1919,7 @@ function updateBackupLabel(){
 
 function doReset(){
   showConfirm('Reset tutti i dati','Questa azione è irreversibile. Tutto verrà cancellato.',function(){
-    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,entrateAttese:0,speseAttese:0,storico:[],goals:[],piano:[]};
+    S={stipendio:0,spese:0,saldo:0,soglia:2000,targetSaldo:0,entrateAttese:0,speseAttese:0,storico:[],piano:[]};
     sv();
     try{
       localStorage.removeItem(LK+'_upd');
@@ -2081,10 +2052,6 @@ function loadDemo(){
     S.piano=[
       {mi:6,anno:2026,eventi:[{name:'Vacanze',amt:1500,tipo:'out'}]},
       {mi:9,anno:2026,eventi:[{name:'Tassa auto',amt:400,tipo:'out'},{name:'Bonus',amt:500,tipo:'in'}]}
-    ];
-    S.goals=[
-      {id:10,name:'Vacanze',target:1500,current:600,monthly:200},
-      {id:11,name:'Fondo emergenza',target:6000,current:3000,monthly:0}
     ];
     sv();
   }
